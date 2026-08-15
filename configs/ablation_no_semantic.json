@@ -1,0 +1,30 @@
+{
+  "model": {
+    "z_dim": 64,
+    "concept_dim": 32,
+    "belief_dim": 32,
+    "operation_dim": 32,
+    "dynamics_hidden_dim": 128,
+    "projector_dropout": 0.0,
+    "dynamics_dropout": 0.1,
+    "membership_temperature": 1.0
+  },
+  "loss": {
+    "dynamics_weight": 1.0,
+    "semantic_weight": 0.0,
+    "diversity_weight": 0.05,
+    "fuzzy_entropy_weight": 0.01,
+    "balance_weight": 0.01,
+    "concept_probe_weight": 0.0,
+    "semantic_temperature": 1.0
+  },
+  "training": {
+    "epochs": 50,
+    "batch_size": 16,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "gradient_clip": 1.0,
+    "validation_fraction": 0.1,
+    "split_by": "category"
+  }
+}

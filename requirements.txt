@@ -1,0 +1,16 @@
+torch
+transformers
+accelerate
+datasets
+pandas
+numpy
+tqdm
+requests
+matplotlib
+tuned-lens==0.2.0
+unidecode
+fancy-einsum
+git+https://github.com/davidbau/baukit
+
+# 只在 Linux x86_64 上安装
+vllm; platform_system == "Linux" and platform_machine == "x86_64"

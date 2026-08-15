@@ -1,0 +1,100 @@
+"""Learning objectives for fuzzy local reasoning dynamics."""
+
+from __future__ import annotations
+
+import itertools
+
+import torch
+import torch.nn.functional as F
+
+from .config import LossConfig
+
+
+def _standardize_signal(values: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
+    mean = values.mean(dim=(0, 1), keepdim=True)
+    std = values.std(dim=(0, 1), keepdim=True, unbiased=False).clamp_min(eps)
+    return (values - mean) / std
+
+
+def semantic_reasoning_prior(
+    outputs: dict[str, torch.Tensor], temperature: float = 1.0
+) -> torch.Tensor:
+    """Construct rho from operation magnitudes, commitment, and concept shifts."""
+    enrichment = outputs["mlp"].norm(dim=-1)
+    routing = outputs["attention"].norm(dim=-1)
+    composition = (outputs["attention"] * outputs["mlp"]).norm(dim=-1)
+    uncertainty = outputs["uncertainty"].squeeze(-1)
+    commitment = uncertainty[:, :-1] - uncertainty[:, 1:]
+    hop = outputs["concept_change"].norm(dim=-1)
+    if "bridge_logprob" in outputs:
+        bridge_raw = outputs["bridge_logprob"].squeeze(-1)
+        bridge_valid = torch.isfinite(bridge_raw[:, 1:]) & torch.isfinite(bridge_raw[:, :-1])
+        bridge = torch.nan_to_num(bridge_raw, nan=0.0)
+        bridge_change = bridge[:, 1:] - bridge[:, :-1]
+        bridge_change = torch.where(bridge_valid, bridge_change, torch.zeros_like(bridge_change))
+        composition = composition + bridge_change.clamp_min(0.0)
+        hop = hop + bridge_change.abs()
+    if "answer_logprob" in outputs:
+        answer_raw = outputs["answer_logprob"].squeeze(-1)
+        answer_valid = torch.isfinite(answer_raw[:, 1:]) & torch.isfinite(answer_raw[:, :-1])
+        answer = torch.nan_to_num(answer_raw, nan=0.0)
+        answer_change = answer[:, 1:] - answer[:, :-1]
+        answer_change = torch.where(answer_valid, answer_change, torch.zeros_like(answer_change))
+        commitment = commitment + answer_change.clamp_min(0.0)
+    scores = torch.stack((enrichment, routing, composition, commitment, hop), dim=-1)
+    scores = _standardize_signal(scores)
+    return torch.softmax(scores / max(temperature, 1e-6), dim=-1)
+
+
+def diversity_loss(local_deltas: torch.Tensor, eps: float = 1e-8) -> torch.Tensor:
+    values = F.normalize(local_deltas, dim=-1, eps=eps)
+    terms = []
+    for left, right in itertools.combinations(range(values.shape[-2]), 2):
+        cosine = (values[..., left, :] * values[..., right, :]).sum(dim=-1)
+        terms.append(cosine.square().mean())
+    return torch.stack(terms).mean()
+
+
+def fuzzy_dynamics_loss(
+    outputs: dict[str, torch.Tensor], config: LossConfig
+) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    memberships = outputs["memberships"].clamp_min(1e-8)
+    dynamics = F.mse_loss(outputs["predicted_delta"], outputs["target_delta"])
+
+    prior = semantic_reasoning_prior(outputs, config.semantic_temperature)
+    semantic = (prior * (prior.clamp_min(1e-8).log() - memberships.log())).sum(-1).mean()
+    diversity = diversity_loss(outputs["local_deltas"])
+
+    # This is negative entropy. Minimizing it discourages premature hard assignments.
+    fuzzy_entropy = (memberships * memberships.log()).sum(dim=-1).mean()
+    mean_membership = memberships.mean(dim=(0, 1))
+    uniform = torch.full_like(mean_membership, 1.0 / mean_membership.numel())
+    balance = (mean_membership * (mean_membership.log() - uniform.log())).sum()
+    concept_probe = torch.zeros((), device=memberships.device)
+    if "bridge_logprob" in outputs:
+        bridge_logprob = outputs["bridge_logprob"]
+        valid = torch.isfinite(bridge_logprob)
+        if valid.any():
+            bridge_probability = torch.nan_to_num(bridge_logprob, nan=-100.0).exp().clamp(0.0, 1.0)
+            concept_probe = F.binary_cross_entropy_with_logits(
+                outputs["bridge_probe_logits"][valid], bridge_probability[valid]
+            )
+
+    total = (
+        config.dynamics_weight * dynamics
+        + config.semantic_weight * semantic
+        + config.diversity_weight * diversity
+        + config.fuzzy_entropy_weight * fuzzy_entropy
+        + config.balance_weight * balance
+        + config.concept_probe_weight * concept_probe
+    )
+    metrics = {
+        "loss": total.detach(),
+        "dynamics": dynamics.detach(),
+        "semantic": semantic.detach(),
+        "diversity": diversity.detach(),
+        "fuzzy_entropy": (-fuzzy_entropy).detach(),
+        "balance": balance.detach(),
+        "concept_probe": concept_probe.detach(),
+    }
+    return total, metrics
