@@ -22,7 +22,6 @@ from src.llm.latent_multi_hop import evaluation_utils
 from src.llm.latent_multi_hop import model_utils
 from src.utils import tee_output_to_log
 import transformers
-from vllm import LLM
 
 AutoModelForCausalLM = transformers.AutoModelForCausalLM
 AutoTokenizer = transformers.AutoTokenizer
@@ -161,6 +160,13 @@ def main(args):
       tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "left"
   elif args.backend == "vllm":
+    try:
+      from vllm import LLM
+    except ImportError as error:
+      raise RuntimeError(
+          "--backend vllm requires a vLLM wheel compatible with this "
+          "server's CUDA and PyTorch versions. Use --backend hf otherwise."
+      ) from error
     if os.environ.get("HF_TOKEN", None) is None:
       os.environ["HF_TOKEN"] = args.hf_token
 

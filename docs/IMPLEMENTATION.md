@@ -4,6 +4,19 @@ This document records how the proposed fuzzy reasoning dynamical system is
 implemented. It is an implementation note, not an additional theoretical
 claim.
 
+## Runtime dependencies
+
+`requirements.txt` is the single dependency specification for the core
+pipeline, Hugging Face extraction, Tuned Lens, and imported analysis utilities.
+The supported full-experiment runtime is Python 3.10-3.12 on Linux x86_64.
+Dependencies are installed on the internet-connected cluster host node into an
+environment shared with GPU nodes. `scripts/check_environment.py` verifies
+imports on the host and CUDA availability on a GPU node before a real-model
+run. Complete Hugging Face model and Tuned Lens directories may be downloaded
+on another machine and uploaded under `data/models/` and `data/tuned_lens/`.
+vLLM remains an explicitly optional, CUDA-specific backend; the Hugging Face
+backend does not import it unless selected.
+
 ## Extracted variables
 
 For a model with `L` Transformer blocks, extraction uses the last non-padding

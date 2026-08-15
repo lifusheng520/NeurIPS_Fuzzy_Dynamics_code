@@ -33,14 +33,52 @@ The author's earlier FuzzyControl code is retained under
 
 ## Installation
 
-Create a Python 3.10+ environment, then install the base dependencies:
+Create a Python 3.10-3.12 environment (Python 3.11 is recommended), then
+install the unified dependency set:
 
 ```bash
 pip install -r requirements.txt
+python -m scripts.check_environment
 ```
 
-The single requirements file also contains the optional Tuned Lens and
-platform-gated vLLM dependencies used by the full experiments.
+The single requirements file covers the fuzzy-dynamics pipeline, Hugging Face
+activation extraction, Tuned Lens, plotting, and imported latent multi-hop
+analysis. Version ranges prevent accidental installation of Transformers 5 with
+the older Tuned Lens API. Baukit is pinned to an immutable Git commit rather
+than a moving branch.
+
+### Cluster installation
+
+Install Python dependencies on the internet-connected host/login node into an
+environment shared with the GPU nodes. Install the CUDA-enabled PyTorch build
+that matches the cluster first when the site's default environment does not
+already provide it, then install the project dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+python -m scripts.check_environment
+```
+
+On a GPU node, activate the same environment and verify CUDA before submitting
+experiments:
+
+```bash
+python -m scripts.check_environment --require-cuda
+python -m unittest discover -s tests -v
+```
+
+If Hugging Face is inaccessible from the cluster, download the complete model
+and Tuned Lens files on another machine (for example, a MacBook), upload them
+without changing their repository directory structure, and place them under
+`data/models/` and `data/tuned_lens/`. All experiment commands should then use
+those local paths; no Hugging Face connection is required at runtime.
+
+vLLM is deliberately not forced into this environment: its compiled wheel must
+match the server CUDA/PyTorch stack. The copied latent-multi-hop evaluation can
+run with `--backend hf` without vLLM. If vLLM is required, install a build that
+matches the cluster CUDA/PyTorch environment on the host node and verify with
+`python -m scripts.check_environment --require-cuda --require-vllm` on a GPU
+node.
 
 ## 1. Extract activations
 

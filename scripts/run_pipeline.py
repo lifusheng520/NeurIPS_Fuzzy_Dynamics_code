@@ -6,12 +6,14 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import platform
 import shlex
 import signal
 import subprocess
 import sys
 from collections.abc import Callable
 from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
 
@@ -38,6 +40,19 @@ class PipelineInterrupted(KeyboardInterrupt):
         self.signum = signum
         self.returncode = 128 + signum
         super().__init__(f"Pipeline received signal {signum}.")
+
+
+TRACKED_DISTRIBUTIONS = (
+    "torch",
+    "transformers",
+    "accelerate",
+    "numpy",
+    "pandas",
+    "datasets",
+    "tuned-lens",
+    "baukit",
+    "vllm",
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -76,6 +91,26 @@ def parse_args() -> argparse.Namespace:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _runtime_environment() -> dict[str, Any]:
+    packages = {}
+    for distribution in TRACKED_DISTRIBUTIONS:
+        try:
+            packages[distribution] = version(distribution)
+        except PackageNotFoundError:
+            packages[distribution] = None
+    uname = platform.uname()
+    return {
+        "python": platform.python_version(),
+        "python_executable": sys.executable,
+        "platform": {
+            "system": uname.system,
+            "release": uname.release,
+            "machine": uname.machine,
+        },
+        "packages": packages,
+    }
 
 
 def _resolve_existing(path: str | Path, label: str) -> Path:
@@ -310,6 +345,7 @@ def main() -> None:
         "started_at": _utc_now(),
         "seed": args.seed,
         "device": args.device,
+        "runtime_environment": _runtime_environment(),
         "activations": str(activations),
         "activation_file_identity": activation_identity,
         "evaluation_activations": str(evaluation_activations),

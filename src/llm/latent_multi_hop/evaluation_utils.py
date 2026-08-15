@@ -30,7 +30,10 @@ import torch
 import tqdm
 import transformers
 import unidecode
-from vllm import SamplingParams
+try:
+  from vllm import SamplingParams
+except ImportError:
+  SamplingParams = None
 
 
 # fact types for pretrained models
@@ -167,7 +170,7 @@ def get_input_dict(
 
 def get_vllm_sampling_params(
     prompt_key: str, instruction_tuned: bool
-) -> SamplingParams:
+) -> Any:
   """Get the sampling parameters for the vLLM model based on the prompt key and whether the model is instruction-tuned.
 
   Args:
@@ -177,6 +180,11 @@ def get_vllm_sampling_params(
   Returns:
       The sampling parameters.
   """
+  if SamplingParams is None:
+    raise RuntimeError(
+        "vLLM is not installed. Use --backend hf or install a vLLM wheel "
+        "compatible with this server's CUDA and PyTorch versions."
+    )
   params = {"seed": 0}
 
   if "blank" in prompt_key:  # instruction-tuned models
