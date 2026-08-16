@@ -6,8 +6,8 @@
 #SBATCH --mem=30G
 #SBATCH --ntasks=1
 #SBATCH --time=06:00:00
-#SBATCH --output=slurm-%x_%j.out
-#SBATCH --error=slurm-%x_%j.err
+#SBATCH --output=logs/slurm-%x_%j.out
+#SBATCH --error=logs/slurm-%x_%j.err
 
 set -euo pipefail
 
@@ -20,8 +20,22 @@ export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
 export OMP_NUM_THREADS="${OMP_NUM_THREADS:-${SLURM_CPUS_PER_TASK:-4}}"
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-FUZZY_PROJECT_ROOT="${FUZZY_PROJECT_ROOT:-$(cd -- "${SCRIPT_DIR}/.." && pwd)}"
+# Slurm executes a spool copy of this file, so BASH_SOURCE points under
+# /var/spool/slurmd rather than to the repository. Jobs submitted from the
+# project root can reliably use SLURM_SUBMIT_DIR.
+if [[ -n "${FUZZY_PROJECT_ROOT:-}" ]]; then
+    FUZZY_PROJECT_ROOT="$(cd -- "${FUZZY_PROJECT_ROOT}" && pwd)"
+elif [[ -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+    FUZZY_PROJECT_ROOT="$(cd -- "${SLURM_SUBMIT_DIR}" && pwd)"
+else
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+    FUZZY_PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+fi
+if [[ ! -f "${FUZZY_PROJECT_ROOT}/scripts/extract_activations.py" ]]; then
+    echo "Project root is invalid: ${FUZZY_PROJECT_ROOT}" >&2
+    echo "Submit from the project root or export FUZZY_PROJECT_ROOT explicitly." >&2
+    exit 2
+fi
 cd "${FUZZY_PROJECT_ROOT}"
 
 PYTHON_EXECUTABLE="${FUZZY_PROJECT_ROOT}/.venv/bin/python"

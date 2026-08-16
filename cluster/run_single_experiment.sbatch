@@ -18,8 +18,19 @@ export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export HF_DATASETS_OFFLINE=1
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-FUZZY_PROJECT_ROOT="${FUZZY_PROJECT_ROOT:-$(cd -- "${SCRIPT_DIR}/.." && pwd)}"
+if [[ -n "${FUZZY_PROJECT_ROOT:-}" ]]; then
+    FUZZY_PROJECT_ROOT="$(cd -- "${FUZZY_PROJECT_ROOT}" && pwd)"
+elif [[ -n "${SLURM_SUBMIT_DIR:-}" ]]; then
+    FUZZY_PROJECT_ROOT="$(cd -- "${SLURM_SUBMIT_DIR}" && pwd)"
+else
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+    FUZZY_PROJECT_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+fi
+if [[ ! -f "${FUZZY_PROJECT_ROOT}/scripts/run_pipeline.py" ]]; then
+    echo "Project root is invalid: ${FUZZY_PROJECT_ROOT}" >&2
+    echo "Submit from the project root or export FUZZY_PROJECT_ROOT explicitly." >&2
+    exit 2
+fi
 cd "${FUZZY_PROJECT_ROOT}"
 
 PYTHON_BIN="${PYTHON_BIN:-python}"
