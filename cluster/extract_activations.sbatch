@@ -18,7 +18,14 @@ export TRANSFORMERS_OFFLINE=1
 export HF_DATASETS_OFFLINE=1
 export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
+export PYTHONNOUSERSITE=1
 export OMP_NUM_THREADS="${OMP_NUM_THREADS:-${SLURM_CPUS_PER_TASK:-4}}"
+
+# Do not mix cluster-wide Python packages with the project virtual environment.
+# The repository is the working directory, so it remains importable without a
+# custom PYTHONPATH.
+unset PYTHONHOME
+unset PYTHONPATH
 
 # Slurm executes a spool copy of this file, so BASH_SOURCE points under
 # /var/spool/slurmd rather than to the repository. Jobs submitted from the
@@ -86,9 +93,14 @@ echo "dataset=${INPUT_PATH}"
 echo "tuned_lens=${LENS_PATH}"
 echo "output=${OUTPUT_PATH} limit=${LIMIT} batch_size=${BATCH_SIZE}"
 
-"${PYTHON_EXECUTABLE}" -m scripts.check_environment --require-cuda
+# Import NumPy before PyTorch in the same interpreter. This avoids a binary
+# extension re-initialization issue observed with the cluster's Python stack.
+"${PYTHON_EXECUTABLE}" -c \
+    'import numpy, runpy; runpy.run_module("scripts.check_environment", run_name="__main__")' \
+    --require-cuda
 
-"${PYTHON_EXECUTABLE}" -m scripts.extract_activations \
+"${PYTHON_EXECUTABLE}" -c \
+    'import numpy, runpy; runpy.run_module("scripts.extract_activations", run_name="__main__")' \
     --model "${MODEL_PATH}" \
     --input "${INPUT_PATH}" \
     --output "${OUTPUT_PATH}" \

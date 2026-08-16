@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import numpy  # Import before PyTorch for binary-extension compatibility on HPC nodes.
 import torch
 
 from scripts.train_fuzzy_dynamics import resolve_device

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import numpy  # Import before PyTorch for binary-extension compatibility on HPC nodes.
 import torch
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer

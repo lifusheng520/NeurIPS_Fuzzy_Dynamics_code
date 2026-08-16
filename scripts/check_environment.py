@@ -14,12 +14,14 @@ from packaging.version import InvalidVersion, Version
 
 
 REQUIRED = {
+    # Import NumPy before packages that initialize its C API indirectly. Some
+    # HPC Python stacks otherwise attempt to initialize the extension twice.
+    "numpy": ("numpy", ">=1.26,<3"),
     "torch": ("torch", ">=2.4,<3"),
     "transformers": ("transformers", ">=4.51,<5"),
     "accelerate": ("accelerate", ">=0.27,<2"),
     "datasets": ("datasets", ">=2.17,<5"),
     "pandas": ("pandas", ">=2,<3"),
-    "numpy": ("numpy", ">=1.26,<3"),
     "tqdm": ("tqdm", ">=4.66,<5"),
     "requests": ("requests", ">=2.31,<3"),
     "matplotlib": ("matplotlib", ">=3.8,<4"),
