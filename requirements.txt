@@ -6,7 +6,10 @@
 # torch>=2.4,<3
 transformers>=4.51,<5
 accelerate>=0.27,<2
-numpy>=1.26,<3
+# NumPy 2.4 Linux wheels require x86-64-v2. Some GPU compute nodes in the
+# target cluster expose only the baseline x86-64 ISA, so use the broadly
+# compatible manylinux wheel from the 1.26 line.
+numpy==1.26.4
 pandas>=2.0,<3
 datasets>=2.17,<5
 tqdm>=4.66,<5

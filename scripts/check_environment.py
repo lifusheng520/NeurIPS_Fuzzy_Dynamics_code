@@ -16,7 +16,7 @@ from packaging.version import InvalidVersion, Version
 REQUIRED = {
     # Import NumPy before packages that initialize its C API indirectly. Some
     # HPC Python stacks otherwise attempt to initialize the extension twice.
-    "numpy": ("numpy", ">=1.26,<3"),
+    "numpy": ("numpy", "==1.26.4"),
     "torch": ("torch", ">=2.4,<3"),
     "transformers": ("transformers", ">=4.51,<5"),
     "accelerate": ("accelerate", ">=0.27,<2"),
