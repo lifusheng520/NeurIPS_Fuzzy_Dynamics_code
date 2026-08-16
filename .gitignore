@@ -1,6 +1,7 @@
 .DS_Store
 __pycache__/
 *.py[cod]
+.venv/
 
 /code_from_others/
 
@@ -16,3 +17,4 @@ __pycache__/
 
 /third_party_licenses/
 /ideas/
+
