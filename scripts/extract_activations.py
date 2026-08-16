@@ -4,12 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import numpy  # Import before PyTorch for binary-extension compatibility on HPC nodes.
 import torch
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers.utils import logging as transformers_logging
 
 from src.data import load_prompt_records
 from src.llm.activation_extractor import ActivationExtractor
@@ -61,6 +63,11 @@ def main() -> None:
         prompt_field=args.prompt_field,
         limit=None if args.limit == 0 else args.limit,
     )
+    # Hugging Face progress bars use stderr by default, which makes successful
+    # checkpoint loading look like an error in Slurm. Our INFO messages and
+    # extraction progress provide stdout status instead.
+    transformers_logging.disable_progress_bar()
+    logger.info("Loading tokenizer from %s", args.model)
     tokenizer = AutoTokenizer.from_pretrained(
         args.model, trust_remote_code=args.trust_remote_code
     )
@@ -70,9 +77,11 @@ def main() -> None:
     }
     if args.device == "auto":
         model_kwargs["device_map"] = "auto"
+    logger.info("Loading model from %s", args.model)
     model = AutoModelForCausalLM.from_pretrained(args.model, **model_kwargs)
     if args.device != "auto":
         model.to(torch.device(args.device))
+    logger.info("Loaded model on device=%s", args.device)
 
     tuned_lens = None
     if args.lens == "tuned":
@@ -87,7 +96,14 @@ def main() -> None:
             model,
             lens_resource_id=args.lens_resource or args.model,
         )
+        model_parameter = next(model.parameters())
+        tuned_lens.to(device=model_parameter.device, dtype=model_parameter.dtype)
         tuned_lens.eval()
+        logger.info(
+            "Loaded Tuned Lens on device=%s dtype=%s",
+            model_parameter.device,
+            model_parameter.dtype,
+        )
 
     extractor = ActivationExtractor(
         model,
@@ -100,7 +116,9 @@ def main() -> None:
     tensor_batches: dict[str, list[torch.Tensor]] = {}
     starts = range(0, len(records), args.batch_size)
     total_batches = len(starts)
-    for batch_number, start in enumerate(tqdm(starts, desc="Extracting"), start=1):
+    for batch_number, start in enumerate(
+        tqdm(starts, desc="Extracting", file=sys.stdout), start=1
+    ):
         batch_records = records[start : start + args.batch_size]
         batch = extractor.extract_batch(
             [record["prompt"] for record in batch_records],

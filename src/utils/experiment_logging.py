@@ -31,10 +31,19 @@ def configure_experiment_logging(
     )
     file_handler = logging.FileHandler(log_path, encoding="utf-8")
     file_handler.setFormatter(formatter)
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
+    class _BelowWarning(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return record.levelno < logging.WARNING
+
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.addFilter(_BelowWarning())
+    stdout_handler.setFormatter(formatter)
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setLevel(logging.WARNING)
+    stderr_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
+    logger.addHandler(stdout_handler)
+    logger.addHandler(stderr_handler)
     logger.info("Log file: %s", log_path.resolve())
 
     def log_uncaught_exception(exc_type, exc_value, traceback) -> None:

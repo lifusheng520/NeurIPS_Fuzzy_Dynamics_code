@@ -6,8 +6,8 @@
 #SBATCH --mem=30G
 #SBATCH --ntasks=1
 #SBATCH --time=6-00:00:00
-#SBATCH --output=logs/slurm/%x_%j.out
-#SBATCH --error=logs/slurm/%x_%j.err
+#SBATCH --output=logs/slurm-%x_%j.out
+#SBATCH --error=logs/slurm-%x_%j.err
 
 
 
@@ -17,6 +17,10 @@ set -euo pipefail
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export HF_DATASETS_OFFLINE=1
+export TOKENIZERS_PARALLELISM=false
+export PYTHONNOUSERSITE=1
+unset PYTHONHOME
+unset PYTHONPATH
 
 if [[ -n "${FUZZY_PROJECT_ROOT:-}" ]]; then
     FUZZY_PROJECT_ROOT="$(cd -- "${FUZZY_PROJECT_ROOT}" && pwd)"
@@ -33,7 +37,7 @@ if [[ ! -f "${FUZZY_PROJECT_ROOT}/scripts/run_pipeline.py" ]]; then
 fi
 cd "${FUZZY_PROJECT_ROOT}"
 
-PYTHON_BIN="${PYTHON_BIN:-python}"
+PYTHON_EXECUTABLE="${FUZZY_PROJECT_ROOT}/.venv/bin/python"
 ACTIVATIONS="${ACTIVATIONS:?Set ACTIVATIONS to an existing activation-cache .pt file.}"
 CONFIG="${CONFIG:-configs/fuzzy_dynamics_base.json}"
 SEED="${SEED:-42}"
@@ -45,8 +49,9 @@ LOG_EVERY_BATCHES="${LOG_EVERY_BATCHES:-10}"
 SUBSET="${SUBSET:-auto}"
 PLOT_INDEX="${PLOT_INDEX:-0}"
 
-if ! command -v "${PYTHON_BIN}" >/dev/null 2>&1; then
-    echo "Python executable not found: ${PYTHON_BIN}" >&2
+if [[ ! -x "${PYTHON_EXECUTABLE}" ]]; then
+    echo "Project virtual-environment Python not found: ${PYTHON_EXECUTABLE}" >&2
+    echo "Create .venv in the project root and install requirements.txt before submitting." >&2
     exit 2
 fi
 if [[ ! -f "${ACTIVATIONS}" ]]; then
@@ -71,11 +76,17 @@ export OMP_NUM_THREADS="${OMP_NUM_THREADS:-${SLURM_CPUS_PER_TASK:-8}}"
 export MPLBACKEND="${MPLBACKEND:-Agg}"
 
 echo "project_root=${FUZZY_PROJECT_ROOT}"
+echo "python=${PYTHON_EXECUTABLE}"
 echo "activations=${ACTIVATIONS}"
 echo "config=${CONFIG} seed=${SEED} device=${DEVICE}"
 
+# NumPy must initialize before PyTorch on the target cluster's compute nodes.
+"${PYTHON_EXECUTABLE}" -c \
+    'import numpy, runpy; runpy.run_module("scripts.check_environment", run_name="__main__")' \
+    --require-cuda
+
 PIPELINE_COMMAND=(
-    "${PYTHON_BIN}" -m scripts.run_pipeline
+    "${PYTHON_EXECUTABLE}" -m scripts.run_pipeline
     --activations "${ACTIVATIONS}"
     --config "${CONFIG}"
     --seed "${SEED}"
