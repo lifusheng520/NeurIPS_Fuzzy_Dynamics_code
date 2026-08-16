@@ -1,0 +1,7 @@
+host=h200-001
+project_root=/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code
+python=/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/bin/python
+model=data/models/Meta-Llama-3-8B
+dataset=data/datasets/latent_multi_hop/SOCRATES_v1.csv
+tuned_lens=data/tuned_lens/lens/meta-llama/Meta-Llama-3-8B
+output=cache/socrates_llama3_8b_tuned_full.pt limit=0 batch_size=1

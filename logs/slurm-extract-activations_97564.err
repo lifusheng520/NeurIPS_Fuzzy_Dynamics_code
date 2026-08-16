@@ -1,0 +1,62 @@
+2026-08-17 00:41:37 | INFO | Log file: /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs/extract_activations/socrates_llama3_8b_tuned_full/extract_activations_20260817_004137_712997.log
+2026-08-17 00:41:37 | INFO | Arguments: {'model': 'data/models/Meta-Llama-3-8B', 'input': 'data/datasets/latent_multi_hop/SOCRATES_v1.csv', 'output': 'cache/socrates_llama3_8b_tuned_full.pt', 'prompt_field': None, 'limit': 0, 'batch_size': 1, 'max_length': 256, 'belief_dim': 32, 'belief_seed': 17, 'top_k': 5, 'lens': 'tuned', 'lens_resource': 'data/tuned_lens/lens/meta-llama/Meta-Llama-3-8B', 'dtype': 'bfloat16', 'device': 'cuda', 'trust_remote_code': False, 'log_dir': 'logs/extract_activations', 'log_every_batches': 10}
+2026-08-17 00:41:37 | INFO | cache_name=socrates_llama3_8b_tuned_full
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:01<00:04,  1.37s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:02<00:02,  1.18s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:04<00:01,  1.45s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:04<00:00,  1.07s/it]
+Extracting:   0%|          | 0/7232 [00:00<?, ?it/s]In file included from /home/90967055/.local/share/uv/python/cpython-3.11-linux-x86_64-gnu/include/python3.11/Python.h:12,
+                 from /tmp/tmpkbhmizut/cuda_utils.c:9:
+/home/90967055/.local/share/uv/python/cpython-3.11-linux-x86_64-gnu/include/python3.11/pyconfig.h:1793:9: warning: ‘_POSIX_C_SOURCE’ redefined
+ 1793 | #define _POSIX_C_SOURCE 200809L
+      |         ^~~~~~~~~~~~~~~
+In file included from /usr/include/bits/libc-header-start.h:33,
+                 from /usr/include/stdlib.h:26,
+                 from /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/triton/backends/nvidia/include/cuda.h:56,
+                 from /tmp/tmpkbhmizut/cuda_utils.c:1:
+/usr/include/features.h:319:10: note: this is the location of the previous definition
+  319 | # define _POSIX_C_SOURCE        202405L
+      |          ^~~~~~~~~~~~~~~
+Extracting:   0%|          | 0/7232 [00:11<?, ?it/s]
+2026-08-17 00:44:18 | CRITICAL | Uncaught exception
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "<frozen runpy>", line 229, in run_module
+  File "<frozen runpy>", line 88, in _run_code
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/scripts/extract_activations.py", line 153, in <module>
+    main()
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/scripts/extract_activations.py", line 105, in main
+    batch = extractor.extract_batch(
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/src/llm/activation_extractor.py", line 270, in extract_batch
+    belief = self._belief_features(
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/src/llm/activation_extractor.py", line 196, in _belief_features
+    logits = self.tuned_lens(hidden.to(lens_device), layer_index).float()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/tuned_lens/nn/lenses.py", line 313, in forward
+    h = self.transform_hidden(h, idx)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/tuned_lens/nn/lenses.py", line 309, in transform_hidden
+    return h + self[idx](h)
+               ^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Expected all tensors to be on the same device, but got mat1 is on cuda:0, different from other tensors on cpu (when checking argument in method wrapper_CUDA_addmm)
