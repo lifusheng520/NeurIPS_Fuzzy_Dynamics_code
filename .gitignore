@@ -1,7 +1,7 @@
 .DS_Store
 __pycache__/
 *.py[cod]
-.venv/
+/.venv/
 
 /code_from_others/
 
@@ -10,7 +10,6 @@ __pycache__/
 /data/models/
 /data/tuned_lens/
 /results/
-/logs/
 *.pt
 *.pth
 
