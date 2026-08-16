@@ -14,6 +14,10 @@
 
 set -euo pipefail
 
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+export HF_DATASETS_OFFLINE=1
+
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 FUZZY_PROJECT_ROOT="${FUZZY_PROJECT_ROOT:-$(cd -- "${SCRIPT_DIR}/.." && pwd)}"
 cd "${FUZZY_PROJECT_ROOT}"
