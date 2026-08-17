@@ -80,6 +80,12 @@ echo "python=${PYTHON_EXECUTABLE}"
 echo "activations=${ACTIVATIONS}"
 echo "config=${CONFIG} seed=${SEED} device=${DEVICE}"
 
+# torch.save uses a ZIP container. Validate its central directory cheaply
+# before importing the full multi-gigabyte cache or starting training.
+"${PYTHON_EXECUTABLE}" -c \
+    'import sys, zipfile; p=sys.argv[1]; z=zipfile.ZipFile(p); names=z.namelist(); z.close(); assert names, f"Empty activation archive: {p}"; print(f"activation_archive_ok={p} entries={len(names)}")' \
+    "${ACTIVATIONS}"
+
 # NumPy must initialize before PyTorch on the target cluster's compute nodes.
 "${PYTHON_EXECUTABLE}" -c \
     'import numpy, runpy; runpy.run_module("scripts.check_environment", run_name="__main__")' \

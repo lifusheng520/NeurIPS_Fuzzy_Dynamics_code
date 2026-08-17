@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
+import zipfile
 from pathlib import Path
 
 import numpy  # Import before PyTorch for binary-extension compatibility on HPC nodes.
@@ -113,7 +115,10 @@ def main() -> None:
         top_k=args.top_k,
         tuned_lens=tuned_lens,
     )
-    tensor_batches: dict[str, list[torch.Tensor]] = {}
+    # Preallocate final CPU tensors instead of retaining thousands of small
+    # batches and concatenating them at the end. For the full SOCRATES cache,
+    # list+cat would temporarily duplicate roughly 12 GB of activation data.
+    tensors: dict[str, torch.Tensor] = {}
     starts = range(0, len(records), args.batch_size)
     total_batches = len(starts)
     for batch_number, start in enumerate(
@@ -127,7 +132,14 @@ def main() -> None:
             answers=[record.get("answer") for record in batch_records],
         )
         for name, values in batch.items():
-            tensor_batches.setdefault(name, []).append(values)
+            if name not in tensors:
+                tensors[name] = torch.empty(
+                    (len(records), *values.shape[1:]),
+                    dtype=values.dtype,
+                    device="cpu",
+                )
+            stop = start + values.shape[0]
+            tensors[name][start:stop].copy_(values)
         if batch_number % args.log_every_batches == 0 or batch_number == total_batches:
             logger.info(
                 "batch=%d/%d extracted_queries=%d/%d",
@@ -137,7 +149,6 @@ def main() -> None:
                 len(records),
             )
 
-    tensors = {name: torch.cat(values, dim=0) for name, values in tensor_batches.items()}
     cache = {
         "format_version": 1,
         "model_name": args.model,
@@ -157,8 +168,24 @@ def main() -> None:
     }
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    torch.save(cache, output)
+    temporary_output = output.with_name(f".{output.name}.tmp-{os.getpid()}")
+    logger.info("Saving activation cache atomically to %s", output.resolve())
+    try:
+        torch.save(cache, temporary_output)
+        # Opening the archive verifies that torch.save wrote its central
+        # directory before the completed cache becomes visible to training.
+        with zipfile.ZipFile(temporary_output) as archive:
+            if not archive.namelist():
+                raise RuntimeError("The serialized activation archive is empty.")
+        temporary_output.replace(output)
+    except BaseException:
+        logger.exception(
+            "Activation cache was not completed; partial file remains at %s",
+            temporary_output.resolve(),
+        )
+        raise
     logger.info("Saved %d trajectories to %s", len(records), output.resolve())
+    logger.info("Activation cache size_bytes=%d", output.stat().st_size)
     logger.info(
         "hidden=%s, attention=%s, belief=%s",
         tuple(cache["hidden"].shape),
