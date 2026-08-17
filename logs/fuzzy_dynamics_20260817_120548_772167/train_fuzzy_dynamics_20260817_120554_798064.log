@@ -1,0 +1,22 @@
+2026-08-17 12:05:54 | INFO | Log file: /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs/fuzzy_dynamics_20260817_120548_772167/train_fuzzy_dynamics_20260817_120554_798064.log
+2026-08-17 12:05:54 | INFO | Arguments: {'activations': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/cache/socrates_llama3_8b_tuned_full.pt', 'results_root': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results', 'experiment_time': '20260817_120548_772167', 'config': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/configs/fuzzy_dynamics_base.json', 'device': 'cuda', 'seed': 42, 'log_dir': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs', 'log_every_batches': 10}
+2026-08-17 12:05:54 | INFO | experiment_time=20260817_120548_772167
+2026-08-17 12:05:55 | CRITICAL | Uncaught exception
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/scripts/train_fuzzy_dynamics.py", line 301, in <module>
+    main()
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/scripts/train_fuzzy_dynamics.py", line 165, in main
+    cache = load_activation_cache(args.activations)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/src/data/activation_data.py", line 36, in load_activation_cache
+    cache = torch.load(Path(path), map_location="cpu", weights_only=False)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/serialization.py", line 1568, in load
+    with _open_zipfile_reader(opened_file) as opened_zipfile:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/lib/python3.11/site-packages/torch/serialization.py", line 807, in __init__
+    super().__init__(torch._C.PyTorchFileReader(name_or_buffer))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: PytorchStreamReader failed reading zip archive: failed finding central directory. This is an internal miniz error. If you are seeing this error, there is a high likelihood that your checkpoint file is corrupted. This can happen if the checkpoint was not saved properly, was transferred incorrectly, or the file was modified after saving.

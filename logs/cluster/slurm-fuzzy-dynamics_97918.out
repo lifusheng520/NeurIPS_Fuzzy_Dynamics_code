@@ -1,0 +1,33 @@
+project_root=/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code
+python=/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/bin/python
+activations=cache/socrates_llama3_8b_tuned_full.pt
+config=configs/fuzzy_dynamics_base.json seed=42 device=cuda
+python=3.11.8 executable=/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/bin/python
+platform=Linux-7.1.4-200.fc44.x86_64-x86_64-with-glibc2.43
+numpy=1.26.4 [ok]
+torch=2.13.0 [ok]
+transformers=4.57.6 [ok]
+accelerate=1.14.0 [ok]
+datasets=4.8.5 [ok]
+pandas=2.3.3 [ok]
+tqdm=4.70.0 [ok]
+requests=2.34.2 [ok]
+matplotlib=3.11.1 [ok]
+tuned-lens=0.2.0 [ok]
+Unidecode=1.4.0 [ok]
+fancy-einsum=0.0.3 [ok]
+PyYAML=6.0.3 [ok]
+sentencepiece=0.2.2 [ok]
+safetensors=0.8.0 [ok]
+baukit=0.0.1 [ok]
+torch_cuda_build=13.0
+cuda_available=True
+cuda_device_count=1
+Environment check passed.
+2026-08-17 12:05:48 | INFO | Log file: /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs/fuzzy_dynamics_20260817_120548_772167/run_pipeline_20260817_120548_784793.log
+2026-08-17 12:05:48 | INFO | experiment_time=20260817_120548_772167
+2026-08-17 12:05:48 | INFO | Experiment directory: /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260817_120548_772167
+2026-08-17 12:05:48 | INFO | Starting training: /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/bin/python -m scripts.train_fuzzy_dynamics --activations /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/cache/socrates_llama3_8b_tuned_full.pt --config /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/configs/fuzzy_dynamics_base.json --seed 42 --device cuda --results-root /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results --experiment-time 20260817_120548_772167 --log-dir /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs --log-every-batches 10
+2026-08-17 12:05:54 | INFO | Log file: /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs/fuzzy_dynamics_20260817_120548_772167/train_fuzzy_dynamics_20260817_120554_798064.log
+2026-08-17 12:05:54 | INFO | Arguments: {'activations': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/cache/socrates_llama3_8b_tuned_full.pt', 'results_root': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results', 'experiment_time': '20260817_120548_772167', 'config': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/configs/fuzzy_dynamics_base.json', 'device': 'cuda', 'seed': 42, 'log_dir': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs', 'log_every_batches': 10}
+2026-08-17 12:05:54 | INFO | experiment_time=20260817_120548_772167
