@@ -1,0 +1,1452 @@
+[
+  {
+    "epoch": 1,
+    "train": {
+      "loss": 0.34953022824258223,
+      "dynamics": 0.31443364013518604,
+      "dynamics_z": 0.2858977143519691,
+      "dynamics_concept": 0.3572019378331547,
+      "dynamics_belief": 0.4350462867213147,
+      "dynamics_uncertainty": 0.179588619752654,
+      "semantic": 0.1527787675054706,
+      "diversity": 0.023998978657039757,
+      "fuzzy_entropy": 1.3871008169894317,
+      "balance": 0.0027326399538243114,
+      "concept_probe": 0.6492488756775856
+    },
+    "validation": {
+      "loss": 0.46479884034297503,
+      "dynamics": 0.4270461621831675,
+      "dynamics_z": 0.2107786961266252,
+      "dynamics_concept": 0.36388865943814885,
+      "dynamics_belief": 0.6129999693299903,
+      "dynamics_uncertainty": 0.520517317486591,
+      "semantic": 0.22855790741130955,
+      "diversity": 0.0159554425779669,
+      "fuzzy_entropy": 1.4704279586917064,
+      "balance": 0.007700572668223596,
+      "concept_probe": 0.5745277697922754
+    }
+  },
+  {
+    "epoch": 2,
+    "train": {
+      "loss": 0.15646855679473706,
+      "dynamics": 0.13442024598088192,
+      "dynamics_z": 0.09239260048358416,
+      "dynamics_concept": 0.13914449195548587,
+      "dynamics_belief": 0.22393689973621952,
+      "dynamics_uncertainty": 0.08220699040827398,
+      "semantic": 0.10828486774877018,
+      "diversity": 0.01808708795222777,
+      "fuzzy_entropy": 1.4165297552030913,
+      "balance": 0.0018362326182814657,
+      "concept_probe": 0.4892480971709806
+    },
+    "validation": {
+      "loss": 0.40681791500967057,
+      "dynamics": 0.37855053485416973,
+      "dynamics_z": 0.18393729724844948,
+      "dynamics_concept": 0.3165017464121834,
+      "dynamics_belief": 0.5581065533591099,
+      "dynamics_uncertainty": 0.45565654581687487,
+      "semantic": 0.2071287605117579,
+      "diversity": 0.013694848407243118,
+      "fuzzy_entropy": 1.4780008910132236,
+      "balance": 0.006735403892263526,
+      "concept_probe": 0.43164831253348807
+    }
+  },
+  {
+    "epoch": 3,
+    "train": {
+      "loss": 0.12457783539228294,
+      "dynamics": 0.10923531345490899,
+      "dynamics_z": 0.07667119223244336,
+      "dynamics_concept": 0.11371529655417009,
+      "dynamics_belief": 0.17744494856772375,
+      "dynamics_uncertainty": 0.06910981772923652,
+      "semantic": 0.09809533571254234,
+      "diversity": 0.01617178151963697,
+      "fuzzy_entropy": 1.4286775771452456,
+      "balance": 0.001384488721520697,
+      "concept_probe": 0.37994659570406897
+    },
+    "validation": {
+      "loss": 0.3750637222508915,
+      "dynamics": 0.35249829072444167,
+      "dynamics_z": 0.17434035082820987,
+      "dynamics_concept": 0.2951674468693186,
+      "dynamics_belief": 0.5230671284628696,
+      "dynamics_uncertainty": 0.4174182415008545,
+      "semantic": 0.19725944712513782,
+      "diversity": 0.012799594032227015,
+      "fuzzy_entropy": 1.4857790997770965,
+      "balance": 0.0076310098339177545,
+      "concept_probe": 0.33961967366640683
+    }
+  },
+  {
+    "epoch": 4,
+    "train": {
+      "loss": 0.10744781356913094,
+      "dynamics": 0.09673253087592977,
+      "dynamics_z": 0.0693178277044576,
+      "dynamics_concept": 0.10173288938038204,
+      "dynamics_belief": 0.1546521240047046,
+      "dynamics_uncertainty": 0.061227281530368695,
+      "semantic": 0.09279077619846378,
+      "diversity": 0.015249933999944098,
+      "fuzzy_entropy": 1.4368207524625622,
+      "balance": 0.0012871512523389003,
+      "concept_probe": 0.3005808704361624
+    },
+    "validation": {
+      "loss": 0.36287931023073977,
+      "dynamics": 0.3449708281970415,
+      "dynamics_z": 0.17308959792383383,
+      "dynamics_concept": 0.28202275907407043,
+      "dynamics_belief": 0.49953075608269115,
+      "dynamics_uncertainty": 0.4252401976311793,
+      "semantic": 0.18327062980073397,
+      "diversity": 0.01215943808621559,
+      "fuzzy_entropy": 1.4868313074111938,
+      "balance": 0.0075081570654130375,
+      "concept_probe": 0.2753335024978294
+    }
+  },
+  {
+    "epoch": 5,
+    "train": {
+      "loss": 0.09707383950221904,
+      "dynamics": 0.08966373332909175,
+      "dynamics_z": 0.0658297612217768,
+      "dynamics_concept": 0.09427571081917505,
+      "dynamics_belief": 0.14085854726786518,
+      "dynamics_uncertainty": 0.05769091415960265,
+      "semantic": 0.08975274877964842,
+      "diversity": 0.01451039524767928,
+      "fuzzy_entropy": 1.441398988877024,
+      "balance": 0.0012374997679625247,
+      "concept_probe": 0.2422185265744219
+    },
+    "validation": {
+      "loss": 0.3440079469172681,
+      "dynamics": 0.3291041318510399,
+      "dynamics_z": 0.16563514424640624,
+      "dynamics_concept": 0.2797909647714896,
+      "dynamics_belief": 0.4816494715995476,
+      "dynamics_uncertainty": 0.3893409398246984,
+      "semantic": 0.1771640259711469,
+      "diversity": 0.011579577749992003,
+      "fuzzy_entropy": 1.4922930998880355,
+      "balance": 0.008672110766905253,
+      "concept_probe": 0.22889284691849693
+    }
+  },
+  {
+    "epoch": 6,
+    "train": {
+      "loss": 0.0889221215620637,
+      "dynamics": 0.084001503124529,
+      "dynamics_z": 0.06280595430990263,
+      "dynamics_concept": 0.08927936054652139,
+      "dynamics_belief": 0.13076262312884235,
+      "dynamics_uncertainty": 0.053158074921491195,
+      "semantic": 0.0873035813054564,
+      "diversity": 0.013851428188250534,
+      "fuzzy_entropy": 1.4454498975252619,
+      "balance": 0.0011999104029441975,
+      "concept_probe": 0.19880376832217586
+    },
+    "validation": {
+      "loss": 0.3348943246681182,
+      "dynamics": 0.3224381286589826,
+      "dynamics_z": 0.168019280326171,
+      "dynamics_concept": 0.2726146649630343,
+      "dynamics_belief": 0.46883730101780813,
+      "dynamics_uncertainty": 0.38028127101601145,
+      "semantic": 0.17084211550775122,
+      "diversity": 0.010939009365488271,
+      "fuzzy_entropy": 1.4909167348361405,
+      "balance": 0.007805070229118965,
+      "concept_probe": 0.19312305113331216
+    }
+  },
+  {
+    "epoch": 7,
+    "train": {
+      "loss": 0.08320829552617304,
+      "dynamics": 0.08012232599703938,
+      "dynamics_z": 0.060450358572891175,
+      "dynamics_concept": 0.08504010874740019,
+      "dynamics_belief": 0.12376079997237847,
+      "dynamics_uncertainty": 0.05123803745575097,
+      "semantic": 0.08594905659176257,
+      "diversity": 0.013204735131193029,
+      "fuzzy_entropy": 1.4489077782752562,
+      "balance": 0.001231895557608294,
+      "concept_probe": 0.16615171126108996
+    },
+    "validation": {
+      "loss": 0.33075643294170254,
+      "dynamics": 0.32026282490276897,
+      "dynamics_z": 0.15558816248276194,
+      "dynamics_concept": 0.2651477360823115,
+      "dynamics_belief": 0.45380075324754243,
+      "dynamics_uncertainty": 0.4065146548826186,
+      "semantic": 0.16460389680549747,
+      "diversity": 0.010445691064977254,
+      "fuzzy_entropy": 1.4919720809967791,
+      "balance": 0.006279930907500083,
+      "concept_probe": 0.16735713012882922
+    }
+  },
+  {
+    "epoch": 8,
+    "train": {
+      "loss": 0.07896642102764881,
+      "dynamics": 0.07730527835118832,
+      "dynamics_z": 0.05899535554784293,
+      "dynamics_concept": 0.08255178540260816,
+      "dynamics_belief": 0.11815979295619289,
+      "dynamics_uncertainty": 0.04951417983072449,
+      "semantic": 0.08464245766173212,
+      "diversity": 0.012674085848147467,
+      "fuzzy_entropy": 1.4513669877636188,
+      "balance": 0.0011878236255142838,
+      "concept_probe": 0.14129967941921584
+    },
+    "validation": {
+      "loss": 0.3095688451020444,
+      "dynamics": 0.3007585308590873,
+      "dynamics_z": 0.15702189138678255,
+      "dynamics_concept": 0.2612491999981833,
+      "dynamics_belief": 0.4451918626417879,
+      "dynamics_uncertainty": 0.3395711691653142,
+      "semantic": 0.15870037015344277,
+      "diversity": 0.009813126878904515,
+      "fuzzy_entropy": 1.4934783314095168,
+      "balance": 0.0067567116061805705,
+      "concept_probe": 0.1463367809526256
+    }
+  },
+  {
+    "epoch": 9,
+    "train": {
+      "loss": 0.07490103034188553,
+      "dynamics": 0.07435265629153166,
+      "dynamics_z": 0.057228098537924946,
+      "dynamics_concept": 0.07983748593880814,
+      "dynamics_belief": 0.11323053703396296,
+      "dynamics_uncertainty": 0.047114504501223564,
+      "semantic": 0.08367056409087108,
+      "diversity": 0.012107531597115556,
+      "fuzzy_entropy": 1.4542627407580007,
+      "balance": 0.0011536173775794497,
+      "concept_probe": 0.12214064197044591
+    },
+    "validation": {
+      "loss": 0.3225631723638441,
+      "dynamics": 0.31441326512665047,
+      "dynamics_z": 0.16170735168652456,
+      "dynamics_concept": 0.2660856808795304,
+      "dynamics_belief": 0.43694324620434494,
+      "dynamics_uncertainty": 0.3929167775834193,
+      "semantic": 0.1596485579111537,
+      "diversity": 0.009468787609309446,
+      "fuzzy_entropy": 1.488415080992902,
+      "balance": 0.008100170886418859,
+      "concept_probe": 0.13029519248692717
+    }
+  },
+  {
+    "epoch": 10,
+    "train": {
+      "loss": 0.07174435955453284,
+      "dynamics": 0.07205758460474257,
+      "dynamics_z": 0.05595111327093779,
+      "dynamics_concept": 0.07741836039349437,
+      "dynamics_belief": 0.1092276256531477,
+      "dynamics_uncertainty": 0.045633239486273756,
+      "semantic": 0.08293132094324243,
+      "diversity": 0.011652575088284758,
+      "fuzzy_entropy": 1.456542941988731,
+      "balance": 0.0011547174336203393,
+      "concept_probe": 0.1072979114417519
+    },
+    "validation": {
+      "loss": 0.308215897835669,
+      "dynamics": 0.3012937185217123,
+      "dynamics_z": 0.15343820755598975,
+      "dynamics_concept": 0.258954044981081,
+      "dynamics_belief": 0.4238154394704787,
+      "dynamics_uncertainty": 0.3689671710866397,
+      "semantic": 0.15370005051620672,
+      "diversity": 0.009033408397655995,
+      "fuzzy_entropy": 1.4914325202097658,
+      "balance": 0.0063316234555400785,
+      "concept_probe": 0.11903021484613419
+    }
+  },
+  {
+    "epoch": 11,
+    "train": {
+      "loss": 0.06922903871733924,
+      "dynamics": 0.07024325648018596,
+      "dynamics_z": 0.05495321412323689,
+      "dynamics_concept": 0.07558830107125092,
+      "dynamics_belief": 0.10567363461821663,
+      "dynamics_uncertainty": 0.0447578759417318,
+      "semantic": 0.08221193032377229,
+      "diversity": 0.011207934509373593,
+      "fuzzy_entropy": 1.4590412293161665,
+      "balance": 0.001079917859526028,
+      "concept_probe": 0.09567609874113482
+    },
+    "validation": {
+      "loss": 0.3142682602171038,
+      "dynamics": 0.3076558318294463,
+      "dynamics_z": 0.15250514093481127,
+      "dynamics_concept": 0.25688098810735294,
+      "dynamics_belief": 0.41082220927613683,
+      "dynamics_uncertainty": 0.4104149971829086,
+      "semantic": 0.15526240502224595,
+      "diversity": 0.008638242305424369,
+      "fuzzy_entropy": 1.492544273861119,
+      "balance": 0.007202965787566099,
+      "concept_probe": 0.11015375624181795
+    }
+  },
+  {
+    "epoch": 12,
+    "train": {
+      "loss": 0.06706986294070981,
+      "dynamics": 0.06862702018258218,
+      "dynamics_z": 0.05389994274520753,
+      "dynamics_concept": 0.07422824891056029,
+      "dynamics_belief": 0.10265906751916117,
+      "dynamics_uncertainty": 0.04372082213034891,
+      "semantic": 0.08170945052893794,
+      "diversity": 0.010868632569623997,
+      "fuzzy_entropy": 1.4610556744191112,
+      "balance": 0.0010876647297385605,
+      "concept_probe": 0.0865629177388488
+    },
+    "validation": {
+      "loss": 0.3026034585276588,
+      "dynamics": 0.2967186579938795,
+      "dynamics_z": 0.14728106631607304,
+      "dynamics_concept": 0.25170891426625797,
+      "dynamics_belief": 0.40283946399805975,
+      "dynamics_uncertainty": 0.3850451891050964,
+      "semantic": 0.15135842048731007,
+      "diversity": 0.00830673664563992,
+      "fuzzy_entropy": 1.491503441920046,
+      "balance": 0.007273756730996194,
+      "concept_probe": 0.10351825627635737
+    }
+  },
+  {
+    "epoch": 13,
+    "train": {
+      "loss": 0.06499656211888911,
+      "dynamics": 0.06699304493638325,
+      "dynamics_z": 0.05323468266549159,
+      "dynamics_concept": 0.07286523956311297,
+      "dynamics_belief": 0.09981440283282071,
+      "dynamics_uncertainty": 0.042057854750630806,
+      "semantic": 0.08125823451092049,
+      "diversity": 0.01050636990052857,
+      "fuzzy_entropy": 1.4628218752997262,
+      "balance": 0.0010810743928863192,
+      "concept_probe": 0.07939565782340205
+    },
+    "validation": {
+      "loss": 0.3024224421528519,
+      "dynamics": 0.2969623479198237,
+      "dynamics_z": 0.1448200871465636,
+      "dynamics_concept": 0.25437811236889635,
+      "dynamics_belief": 0.39860092543187686,
+      "dynamics_uncertainty": 0.39005025683856404,
+      "semantic": 0.1499691429685374,
+      "diversity": 0.008143153018699806,
+      "fuzzy_entropy": 1.4910833503379197,
+      "balance": 0.005721820373332403,
+      "concept_probe": 0.098192746766278
+    }
+  },
+  {
+    "epoch": 14,
+    "train": {
+      "loss": 0.06344784822847162,
+      "dynamics": 0.06578266821155439,
+      "dynamics_z": 0.05271484248568209,
+      "dynamics_concept": 0.07193074814443078,
+      "dynamics_belief": 0.09728117558953105,
+      "dynamics_uncertainty": 0.041203907291804044,
+      "semantic": 0.08102718275040388,
+      "diversity": 0.010223214685612795,
+      "fuzzy_entropy": 1.464726912732027,
+      "balance": 0.0010783576064048767,
+      "concept_probe": 0.07375572837547076
+    },
+    "validation": {
+      "loss": 0.2990279920765611,
+      "dynamics": 0.29405353743521895,
+      "dynamics_z": 0.1483857842986701,
+      "dynamics_concept": 0.2572283488316614,
+      "dynamics_belief": 0.3909401986442628,
+      "dynamics_uncertainty": 0.3796598154013274,
+      "semantic": 0.14722651951625698,
+      "diversity": 0.00806560869649297,
+      "fuzzy_entropy": 1.4926961816725184,
+      "balance": 0.004969645436608889,
+      "concept_probe": 0.09451573390941151
+    }
+  },
+  {
+    "epoch": 15,
+    "train": {
+      "loss": 0.06189379062769668,
+      "dynamics": 0.0645150778416012,
+      "dynamics_z": 0.05193948198337944,
+      "dynamics_concept": 0.07078541001799155,
+      "dynamics_belief": 0.09526177613558817,
+      "dynamics_uncertainty": 0.0400736424786856,
+      "semantic": 0.080609369072683,
+      "diversity": 0.009991712937112518,
+      "fuzzy_entropy": 1.4660742586972761,
+      "balance": 0.0010418820379249044,
+      "concept_probe": 0.06937027783418188
+    },
+    "validation": {
+      "loss": 0.3018526935675105,
+      "dynamics": 0.2967244863021569,
+      "dynamics_z": 0.1488885485002252,
+      "dynamics_concept": 0.25808646053564355,
+      "dynamics_belief": 0.3792325150771219,
+      "dynamics_uncertainty": 0.40069041926352705,
+      "semantic": 0.1500032815288325,
+      "diversity": 0.007962494187789862,
+      "fuzzy_entropy": 1.4930686892056075,
+      "balance": 0.006781840765635009,
+      "concept_probe": 0.09185252185972011
+    }
+  },
+  {
+    "epoch": 16,
+    "train": {
+      "loss": 0.06059653963893652,
+      "dynamics": 0.06346986154854602,
+      "dynamics_z": 0.05163749276033165,
+      "dynamics_concept": 0.07012883100506602,
+      "dynamics_belief": 0.0932224423491529,
+      "dynamics_uncertainty": 0.03889067964248207,
+      "semantic": 0.08008566622299199,
+      "diversity": 0.009779829070998393,
+      "fuzzy_entropy": 1.4675538415203289,
+      "balance": 0.0010347117450710728,
+      "concept_probe": 0.06588622413537636
+    },
+    "validation": {
+      "loss": 0.29845224125463454,
+      "dynamics": 0.2937751290250997,
+      "dynamics_z": 0.14573580307550119,
+      "dynamics_concept": 0.25551868193462246,
+      "dynamics_belief": 0.374668756957914,
+      "dynamics_uncertainty": 0.3991772771858778,
+      "semantic": 0.1467332334303465,
+      "diversity": 0.008008675115396742,
+      "fuzzy_entropy": 1.4939537673700052,
+      "balance": 0.0055931952751440105,
+      "concept_probe": 0.08973928809654518
+    }
+  },
+  {
+    "epoch": 17,
+    "train": {
+      "loss": 0.059569789096713066,
+      "dynamics": 0.06260854836401282,
+      "dynamics_z": 0.050912557939561655,
+      "dynamics_concept": 0.068946308903016,
+      "dynamics_belief": 0.09170345612326447,
+      "dynamics_uncertainty": 0.038871870252626894,
+      "semantic": 0.08002687758785121,
+      "diversity": 0.009561810808788453,
+      "fuzzy_entropy": 1.4690341371662763,
+      "balance": 0.001033412975797249,
+      "concept_probe": 0.06320937661149977
+    },
+    "validation": {
+      "loss": 0.2959932369775459,
+      "dynamics": 0.2915915509716409,
+      "dynamics_z": 0.14489486227270032,
+      "dynamics_concept": 0.25258165451346853,
+      "dynamics_belief": 0.37105054933516707,
+      "dynamics_uncertainty": 0.39783913605525845,
+      "semantic": 0.14496319850937264,
+      "diversity": 0.008106554194246648,
+      "fuzzy_entropy": 1.4970831421555066,
+      "balance": 0.005388048569076374,
+      "concept_probe": 0.08833983317628259
+    }
+  },
+  {
+    "epoch": 18,
+    "train": {
+      "loss": 0.0585353161417404,
+      "dynamics": 0.06172185786524598,
+      "dynamics_z": 0.050430886913090944,
+      "dynamics_concept": 0.06831384355164304,
+      "dynamics_belief": 0.09006217163892424,
+      "dynamics_uncertainty": 0.03808052875386665,
+      "semantic": 0.07973803066629537,
+      "diversity": 0.009360406533529868,
+      "fuzzy_entropy": 1.469700992715602,
+      "balance": 0.0010139318729503726,
+      "concept_probe": 0.061170100186932454
+    },
+    "validation": {
+      "loss": 0.3004239199102902,
+      "dynamics": 0.2960733136192697,
+      "dynamics_z": 0.1509948976215769,
+      "dynamics_concept": 0.24791105824415802,
+      "dynamics_belief": 0.36728536936103323,
+      "dynamics_uncertainty": 0.4181019368230319,
+      "semantic": 0.14508683075670337,
+      "diversity": 0.008030009715527784,
+      "fuzzy_entropy": 1.4971601982585718,
+      "balance": 0.004347513674101869,
+      "concept_probe": 0.0873709717673845
+    }
+  },
+  {
+    "epoch": 19,
+    "train": {
+      "loss": 0.057690979485228965,
+      "dynamics": 0.0609992979645577,
+      "dynamics_z": 0.05063889881748022,
+      "dynamics_concept": 0.06788113376847943,
+      "dynamics_belief": 0.0886383983021488,
+      "dynamics_uncertainty": 0.036838761302737555,
+      "semantic": 0.07948440320941867,
+      "diversity": 0.009282853668175486,
+      "fuzzy_entropy": 1.471265961625138,
+      "balance": 0.00099188407159313,
+      "concept_probe": 0.05963678069754827
+    },
+    "validation": {
+      "loss": 0.29588603704679206,
+      "dynamics": 0.2917827023345916,
+      "dynamics_z": 0.14716038449865873,
+      "dynamics_concept": 0.25112948139182856,
+      "dynamics_belief": 0.3629825867590357,
+      "dynamics_uncertainty": 0.40585835131465414,
+      "semantic": 0.14277486148916307,
+      "diversity": 0.008096182993689522,
+      "fuzzy_entropy": 1.4968356402193914,
+      "balance": 0.0045838053948932984,
+      "concept_probe": 0.08687117637791594
+    }
+  },
+  {
+    "epoch": 20,
+    "train": {
+      "loss": 0.05682986405469021,
+      "dynamics": 0.060227204978998215,
+      "dynamics_z": 0.04976799489208022,
+      "dynamics_concept": 0.06709487512897776,
+      "dynamics_belief": 0.087386025781078,
+      "dynamics_uncertainty": 0.0366599238857779,
+      "semantic": 0.07937355299613305,
+      "diversity": 0.009144140169860758,
+      "fuzzy_entropy": 1.4724796055531015,
+      "balance": 0.0010096150282912944,
+      "concept_probe": 0.058455922365264625
+    },
+    "validation": {
+      "loss": 0.3004435943286927,
+      "dynamics": 0.29579079151153564,
+      "dynamics_z": 0.15069652959460117,
+      "dynamics_concept": 0.2554992361635458,
+      "dynamics_belief": 0.362181156140859,
+      "dynamics_uncertainty": 0.41478624207074527,
+      "semantic": 0.14803977017519904,
+      "diversity": 0.008085938475903918,
+      "fuzzy_entropy": 1.4955927231272712,
+      "balance": 0.006638261191852269,
+      "concept_probe": 0.08668146584732611
+    }
+  },
+  {
+    "epoch": 21,
+    "train": {
+      "loss": 0.05576784580907956,
+      "dynamics": 0.05925779861911219,
+      "dynamics_z": 0.04917174764927857,
+      "dynamics_concept": 0.0663077580191347,
+      "dynamics_belief": 0.08601112756878138,
+      "dynamics_uncertainty": 0.035540561647895645,
+      "semantic": 0.07902797258325986,
+      "diversity": 0.009005058936926782,
+      "fuzzy_entropy": 1.473462030899768,
+      "balance": 0.0009313366554495736,
+      "concept_probe": 0.05764607283077678
+    },
+    "validation": {
+      "loss": 0.29363377172438826,
+      "dynamics": 0.2891552411630505,
+      "dynamics_z": 0.14746251128247526,
+      "dynamics_concept": 0.2503605848941647,
+      "dynamics_belief": 0.35676554773674635,
+      "dynamics_uncertainty": 0.4020323237923325,
+      "semantic": 0.14644276973654013,
+      "diversity": 0.008112373945043713,
+      "fuzzy_entropy": 1.4964967653399608,
+      "balance": 0.006349702785554968,
+      "concept_probe": 0.08660211136228725
+    }
+  },
+  {
+    "epoch": 22,
+    "train": {
+      "loss": 0.055365274147111544,
+      "dynamics": 0.058914386990423104,
+      "dynamics_z": 0.04917345278687319,
+      "dynamics_concept": 0.06590575678274035,
+      "dynamics_belief": 0.08518672481711421,
+      "dynamics_uncertainty": 0.03539161342291199,
+      "semantic": 0.0788971584062187,
+      "diversity": 0.008873832687659532,
+      "fuzzy_entropy": 1.4744000818048204,
+      "balance": 0.0009498426311902407,
+      "concept_probe": 0.0570396349233176
+    },
+    "validation": {
+      "loss": 0.2972586184251504,
+      "dynamics": 0.29305482203843164,
+      "dynamics_z": 0.15455111494806947,
+      "dynamics_concept": 0.2508952898568794,
+      "dynamics_belief": 0.3561633944999976,
+      "dynamics_uncertainty": 0.4106094849402787,
+      "semantic": 0.14395980707934644,
+      "diversity": 0.008239509514914672,
+      "fuzzy_entropy": 1.4999127954733176,
+      "balance": 0.005882034093507978,
+      "concept_probe": 0.08672292936654365
+    }
+  },
+  {
+    "epoch": 23,
+    "train": {
+      "loss": 0.05469598173524956,
+      "dynamics": 0.05829616297720647,
+      "dynamics_z": 0.048771678080440174,
+      "dynamics_concept": 0.065324403773233,
+      "dynamics_belief": 0.0840392508448995,
+      "dynamics_uncertainty": 0.03504931859253925,
+      "semantic": 0.07873894279936747,
+      "diversity": 0.008802816031823809,
+      "fuzzy_entropy": 1.4755419805950047,
+      "balance": 0.000935826590314403,
+      "concept_probe": 0.05663689694424369
+    },
+    "validation": {
+      "loss": 0.29939061061280675,
+      "dynamics": 0.29514279399738935,
+      "dynamics_z": 0.1562098179195748,
+      "dynamics_concept": 0.2493198829107597,
+      "dynamics_belief": 0.35425211904478854,
+      "dynamics_uncertainty": 0.42078935416018376,
+      "semantic": 0.14432612501206946,
+      "diversity": 0.008334278129041195,
+      "fuzzy_entropy": 1.5000993853709736,
+      "balance": 0.005195307927053483,
+      "concept_probe": 0.08695067075981958
+    }
+  },
+  {
+    "epoch": 24,
+    "train": {
+      "loss": 0.05403027286258887,
+      "dynamics": 0.05768073505094769,
+      "dynamics_z": 0.048389452699647874,
+      "dynamics_concept": 0.06496184502671264,
+      "dynamics_belief": 0.08314430018012621,
+      "dynamics_uncertainty": 0.0342273421167415,
+      "semantic": 0.0784929683431983,
+      "diversity": 0.008681049258020535,
+      "fuzzy_entropy": 1.4762420091702013,
+      "balance": 0.0009444507699559576,
+      "concept_probe": 0.05638326850852796
+    },
+    "validation": {
+      "loss": 0.2868736132246549,
+      "dynamics": 0.28242414432470914,
+      "dynamics_z": 0.14921667768818433,
+      "dynamics_concept": 0.2506279605822485,
+      "dynamics_belief": 0.34549400552374415,
+      "dynamics_uncertainty": 0.38435793093970566,
+      "semantic": 0.14551527089759952,
+      "diversity": 0.00827167882416092,
+      "fuzzy_entropy": 1.494678686876766,
+      "balance": 0.0070191048711660455,
+      "concept_probe": 0.08721914076719617
+    }
+  },
+  {
+    "epoch": 25,
+    "train": {
+      "loss": 0.0539557049240993,
+      "dynamics": 0.057626113637673615,
+      "dynamics_z": 0.048857736505796105,
+      "dynamics_concept": 0.0649756837199081,
+      "dynamics_belief": 0.08249355411651182,
+      "dynamics_uncertainty": 0.03417748063612653,
+      "semantic": 0.07847712215568338,
+      "diversity": 0.008644307474130574,
+      "fuzzy_entropy": 1.4770900123581594,
+      "balance": 0.0009274148049334311,
+      "concept_probe": 0.05622579092730065
+    },
+    "validation": {
+      "loss": 0.28968872862761136,
+      "dynamics": 0.285604575129806,
+      "dynamics_z": 0.14567189211728143,
+      "dynamics_concept": 0.24725998058670856,
+      "dynamics_belief": 0.3451454390267857,
+      "dynamics_uncertainty": 0.4043409887884484,
+      "semantic": 0.14254955654261542,
+      "diversity": 0.008464118923808708,
+      "fuzzy_entropy": 1.5013049117854385,
+      "balance": 0.004525897169455153,
+      "concept_probe": 0.08747561169085932
+    }
+  },
+  {
+    "epoch": 26,
+    "train": {
+      "loss": 0.05295056270017308,
+      "dynamics": 0.05667072509852599,
+      "dynamics_z": 0.04763543424291574,
+      "dynamics_concept": 0.06413056367856203,
+      "dynamics_belief": 0.08152875105603313,
+      "dynamics_uncertainty": 0.033388151715946744,
+      "semantic": 0.07814649591336445,
+      "diversity": 0.00858773623251033,
+      "fuzzy_entropy": 1.4780258177494516,
+      "balance": 0.0008925980206297434,
+      "concept_probe": 0.056142663450113366
+    },
+    "validation": {
+      "loss": 0.28938193399398054,
+      "dynamics": 0.2850090766050776,
+      "dynamics_z": 0.14393883271784078,
+      "dynamics_concept": 0.24454658270859328,
+      "dynamics_belief": 0.34019861773389287,
+      "dynamics_uncertainty": 0.4113522728935617,
+      "semantic": 0.14495206880764883,
+      "diversity": 0.008350561830963268,
+      "fuzzy_entropy": 1.4996532377649525,
+      "balance": 0.007120714599236113,
+      "concept_probe": 0.08770890370560963
+    }
+  },
+  {
+    "epoch": 27,
+    "train": {
+      "loss": 0.052878668474755725,
+      "dynamics": 0.056600939482450485,
+      "dynamics_z": 0.0481844653318427,
+      "dynamics_concept": 0.0641395902850342,
+      "dynamics_belief": 0.08092784073812012,
+      "dynamics_uncertainty": 0.03315186194543328,
+      "semantic": 0.07825843499479246,
+      "diversity": 0.008501322114393495,
+      "fuzzy_entropy": 1.4786054452463073,
+      "balance": 0.0009324388690346291,
+      "concept_probe": 0.05607098368547705
+    },
+    "validation": {
+      "loss": 0.2885898486024044,
+      "dynamics": 0.2843040965619634,
+      "dynamics_z": 0.14603491200775395,
+      "dynamics_concept": 0.24651834490846414,
+      "dynamics_belief": 0.33626158046917837,
+      "dynamics_uncertainty": 0.40840155521377186,
+      "semantic": 0.14410285688326008,
+      "diversity": 0.008728859320160796,
+      "fuzzy_entropy": 1.50127103875895,
+      "balance": 0.00563802170475609,
+      "concept_probe": 0.0879070812408797
+    }
+  },
+  {
+    "epoch": 28,
+    "train": {
+      "loss": 0.0521911018128906,
+      "dynamics": 0.05594782645300943,
+      "dynamics_z": 0.047509892682107736,
+      "dynamics_concept": 0.06358654751461379,
+      "dynamics_belief": 0.08012511180143575,
+      "dynamics_uncertainty": 0.03256975365232448,
+      "semantic": 0.07801907684425918,
+      "diversity": 0.008450796413092817,
+      "fuzzy_entropy": 1.4794295664344514,
+      "balance": 0.0009498020972015945,
+      "concept_probe": 0.05607249857667757
+    },
+    "validation": {
+      "loss": 0.2906748464361566,
+      "dynamics": 0.28667821405363864,
+      "dynamics_z": 0.14176046604015788,
+      "dynamics_concept": 0.24681350026951462,
+      "dynamics_belief": 0.3384126170736844,
+      "dynamics_uncertainty": 0.4197262669684457,
+      "semantic": 0.14150857278069512,
+      "diversity": 0.008676007191543697,
+      "fuzzy_entropy": 1.5036593695155909,
+      "balance": 0.004669171819066415,
+      "concept_probe": 0.08803754199113024
+    }
+  },
+  {
+    "epoch": 29,
+    "train": {
+      "loss": 0.0515784757230811,
+      "dynamics": 0.055367830361486695,
+      "dynamics_z": 0.04714636813507092,
+      "dynamics_concept": 0.062931411272409,
+      "dynamics_belief": 0.07945014184758979,
+      "dynamics_uncertainty": 0.031943400010314524,
+      "semantic": 0.07780055075465721,
+      "diversity": 0.00836332598748636,
+      "fuzzy_entropy": 1.480044704310748,
+      "balance": 0.0008754598780722851,
+      "concept_probe": 0.05608232344063569
+    },
+    "validation": {
+      "loss": 0.2953882811010861,
+      "dynamics": 0.29120998548679666,
+      "dynamics_z": 0.1453593110696214,
+      "dynamics_concept": 0.2549635897405812,
+      "dynamics_belief": 0.33532372556748935,
+      "dynamics_uncertainty": 0.42919331715732323,
+      "semantic": 0.14289841287937322,
+      "diversity": 0.008830328563564136,
+      "fuzzy_entropy": 1.500555630590095,
+      "balance": 0.004502815320385528,
+      "concept_probe": 0.08814917091035941
+    }
+  },
+  {
+    "epoch": 30,
+    "train": {
+      "loss": 0.051385587632504046,
+      "dynamics": 0.055195766862253755,
+      "dynamics_z": 0.047096186583595614,
+      "dynamics_concept": 0.06291594558718558,
+      "dynamics_belief": 0.07884978956295824,
+      "dynamics_uncertainty": 0.031921145468190006,
+      "semantic": 0.07770622135805232,
+      "diversity": 0.008315721530305716,
+      "fuzzy_entropy": 1.4808451283951194,
+      "balance": 0.0008535218820521105,
+      "concept_probe": 0.05606656672661098
+    },
+    "validation": {
+      "loss": 0.2990540937810648,
+      "dynamics": 0.29492631114897183,
+      "dynamics_z": 0.15196950379453722,
+      "dynamics_concept": 0.2545843565317451,
+      "dynamics_belief": 0.3369413289378901,
+      "dynamics_uncertainty": 0.4362100509346509,
+      "semantic": 0.14230358539546123,
+      "diversity": 0.008900967945695901,
+      "fuzzy_entropy": 1.5010788812011968,
+      "balance": 0.0052104634958029285,
+      "concept_probe": 0.08822121807053442
+    }
+  },
+  {
+    "epoch": 31,
+    "train": {
+      "loss": 0.050924388644266495,
+      "dynamics": 0.05476689290217295,
+      "dynamics_z": 0.047033338893052876,
+      "dynamics_concept": 0.0627418331497786,
+      "dynamics_belief": 0.07828726063539483,
+      "dynamics_uncertainty": 0.03100513909202145,
+      "semantic": 0.07744877155376029,
+      "diversity": 0.008295222936312154,
+      "fuzzy_entropy": 1.4813911847922268,
+      "balance": 0.0008346268342782943,
+      "concept_probe": 0.05606845727342428
+    },
+    "validation": {
+      "loss": 0.297190463689507,
+      "dynamics": 0.2930629526982542,
+      "dynamics_z": 0.14443447966067519,
+      "dynamics_concept": 0.24895558518464447,
+      "dynamics_belief": 0.33351192171456384,
+      "dynamics_uncertainty": 0.4453498132404734,
+      "semantic": 0.1424267728064881,
+      "diversity": 0.008964473228962695,
+      "fuzzy_entropy": 1.5027926339477788,
+      "balance": 0.005182266777350766,
+      "concept_probe": 0.08825420490542396
+    }
+  },
+  {
+    "epoch": 32,
+    "train": {
+      "loss": 0.05069992736894257,
+      "dynamics": 0.05455951864964196,
+      "dynamics_z": 0.04676280998415789,
+      "dynamics_concept": 0.06247228651060438,
+      "dynamics_belief": 0.0778098163213961,
+      "dynamics_uncertainty": 0.03119316155908211,
+      "semantic": 0.07736475547129402,
+      "diversity": 0.008221789433060176,
+      "fuzzy_entropy": 1.4819239320195452,
+      "balance": 0.0008575127447292456,
+      "concept_probe": 0.05607015435222765
+    },
+    "validation": {
+      "loss": 0.2953277525843167,
+      "dynamics": 0.29119504841624716,
+      "dynamics_z": 0.14770552002992787,
+      "dynamics_concept": 0.25863143667334415,
+      "dynamics_belief": 0.3330633728230586,
+      "dynamics_uncertainty": 0.42537986865786254,
+      "semantic": 0.14242076311932236,
+      "diversity": 0.008980028056463257,
+      "fuzzy_entropy": 1.5022706418740945,
+      "balance": 0.00486963401456959,
+      "concept_probe": 0.08831270007019648
+    }
+  },
+  {
+    "epoch": 33,
+    "train": {
+      "loss": 0.05007812564204238,
+      "dynamics": 0.05395014970848451,
+      "dynamics_z": 0.04639201596075175,
+      "dynamics_concept": 0.06186754399986596,
+      "dynamics_belief": 0.07709772002940275,
+      "dynamics_uncertainty": 0.030443318478040854,
+      "semantic": 0.07735693901397135,
+      "diversity": 0.008162478842696518,
+      "fuzzy_entropy": 1.4826442605378676,
+      "balance": 0.0008303237484550645,
+      "concept_probe": 0.05604594217955458
+    },
+    "validation": {
+      "loss": 0.2958716075928485,
+      "dynamics": 0.2917504870012158,
+      "dynamics_z": 0.14276879671655718,
+      "dynamics_concept": 0.24810721737439514,
+      "dynamics_belief": 0.32845586000895893,
+      "dynamics_uncertainty": 0.4476700737828114,
+      "semantic": 0.14232569358876493,
+      "diversity": 0.009223211526137884,
+      "fuzzy_entropy": 1.5034739658480785,
+      "balance": 0.0048393289192167465,
+      "concept_probe": 0.08827478069140286
+    }
+  },
+  {
+    "epoch": 34,
+    "train": {
+      "loss": 0.05001280044338533,
+      "dynamics": 0.05389826450192807,
+      "dynamics_z": 0.046213959704856485,
+      "dynamics_concept": 0.061703678543622395,
+      "dynamics_belief": 0.0768497482664427,
+      "dynamics_uncertainty": 0.03082567156881702,
+      "semantic": 0.07727505273318716,
+      "diversity": 0.008119995576301019,
+      "fuzzy_entropy": 1.4830787260921634,
+      "balance": 0.0008465134629585343,
+      "concept_probe": 0.056067052553883015
+    },
+    "validation": {
+      "loss": 0.2998462314488458,
+      "dynamics": 0.2955521235211951,
+      "dynamics_z": 0.14801693170285615,
+      "dynamics_concept": 0.24466413430503156,
+      "dynamics_belief": 0.3322155497601775,
+      "dynamics_uncertainty": 0.45731187966026243,
+      "semantic": 0.14369217440730236,
+      "diversity": 0.009156745476800888,
+      "fuzzy_entropy": 1.5023044347763062,
+      "balance": 0.007795587701142811,
+      "concept_probe": 0.08824276811153185
+    }
+  },
+  {
+    "epoch": 35,
+    "train": {
+      "loss": 0.04955220785068006,
+      "dynamics": 0.05346667598362784,
+      "dynamics_z": 0.0461957304054225,
+      "dynamics_concept": 0.06162809423760188,
+      "dynamics_belief": 0.07620362572524013,
+      "dynamics_uncertainty": 0.0298392537468094,
+      "semantic": 0.07705356192071827,
+      "diversity": 0.008078304157421296,
+      "fuzzy_entropy": 1.4835120509473645,
+      "balance": 0.0008364329641692017,
+      "concept_probe": 0.056060327882213254
+    },
+    "validation": {
+      "loss": 0.29910534278291173,
+      "dynamics": 0.29495235862302,
+      "dynamics_z": 0.14746853929074083,
+      "dynamics_concept": 0.24852425666129002,
+      "dynamics_belief": 0.3297944169064037,
+      "dynamics_uncertainty": 0.4540222194351134,
+      "semantic": 0.1428600379922351,
+      "diversity": 0.009341558059830158,
+      "fuzzy_entropy": 1.5056890952782553,
+      "balance": 0.00519602147282147,
+      "concept_probe": 0.08809663207254938
+    }
+  },
+  {
+    "epoch": 36,
+    "train": {
+      "loss": 0.0496150856666571,
+      "dynamics": 0.053529981770837794,
+      "dynamics_z": 0.04646143150914993,
+      "dynamics_concept": 0.06158901333846912,
+      "dynamics_belief": 0.07584364951721259,
+      "dynamics_uncertainty": 0.030225833179429173,
+      "semantic": 0.07710409031382628,
+      "diversity": 0.00806898416651945,
+      "fuzzy_entropy": 1.4840212108529345,
+      "balance": 0.0008711139407194201,
+      "concept_probe": 0.05605492196330915
+    },
+    "validation": {
+      "loss": 0.29994925197030675,
+      "dynamics": 0.29575754531094284,
+      "dynamics_z": 0.15083856782952293,
+      "dynamics_concept": 0.24330751439098453,
+      "dynamics_belief": 0.32785200803983405,
+      "dynamics_uncertainty": 0.46103210405248113,
+      "semantic": 0.14296697544269873,
+      "diversity": 0.009298974373301521,
+      "fuzzy_entropy": 1.5035156695569147,
+      "balance": 0.005410919740765554,
+      "concept_probe": 0.08822211655253759
+    }
+  },
+  {
+    "epoch": 37,
+    "train": {
+      "loss": 0.04894013826412206,
+      "dynamics": 0.05289992191163557,
+      "dynamics_z": 0.04570723226179882,
+      "dynamics_concept": 0.0609349830418217,
+      "dynamics_belief": 0.07538332152465473,
+      "dynamics_uncertainty": 0.02957415071848248,
+      "semantic": 0.07672454302712363,
+      "diversity": 0.008027445387133226,
+      "fuzzy_entropy": 1.4845008244928048,
+      "balance": 0.0008097249390593045,
+      "concept_probe": 0.05606600727733909
+    },
+    "validation": {
+      "loss": 0.29398798356290723,
+      "dynamics": 0.29002274328567945,
+      "dynamics_z": 0.14753819537944482,
+      "dynamics_concept": 0.24723810348354402,
+      "dynamics_belief": 0.3268475105039409,
+      "dynamics_uncertainty": 0.43846716914997724,
+      "semantic": 0.14149221924484753,
+      "diversity": 0.00922344795993117,
+      "fuzzy_entropy": 1.5092330018027884,
+      "balance": 0.003177146520847302,
+      "concept_probe": 0.08830807500015028
+    }
+  },
+  {
+    "epoch": 38,
+    "train": {
+      "loss": 0.04877472991047769,
+      "dynamics": 0.05272920245342717,
+      "dynamics_z": 0.04552885715146454,
+      "dynamics_concept": 0.06076795612556898,
+      "dynamics_belief": 0.0750551312610659,
+      "dynamics_uncertainty": 0.02956486570325737,
+      "semantic": 0.07684351642597087,
+      "diversity": 0.007970158874332828,
+      "fuzzy_entropy": 1.4848905461175101,
+      "balance": 0.0008458375125382172,
+      "concept_probe": 0.05606229441734601
+    },
+    "validation": {
+      "loss": 0.3017311890105732,
+      "dynamics": 0.29726304797852626,
+      "dynamics_z": 0.1463941539653012,
+      "dynamics_concept": 0.24377920319799518,
+      "dynamics_belief": 0.3299545863124191,
+      "dynamics_uncertainty": 0.46892425173618757,
+      "semantic": 0.14539922578412978,
+      "diversity": 0.009265666644348473,
+      "fuzzy_entropy": 1.5026182073061582,
+      "balance": 0.007747150201839013,
+      "concept_probe": 0.08827291864168937
+    }
+  },
+  {
+    "epoch": 39,
+    "train": {
+      "loss": 0.048529336533072044,
+      "dynamics": 0.05249921092763543,
+      "dynamics_z": 0.04571255131111461,
+      "dynamics_concept": 0.06057604925935062,
+      "dynamics_belief": 0.07466487121787302,
+      "dynamics_uncertainty": 0.029043371646608016,
+      "semantic": 0.07673613614953902,
+      "diversity": 0.007952563475332774,
+      "fuzzy_entropy": 1.485324995250118,
+      "balance": 0.000837066477214073,
+      "concept_probe": 0.056075258104472746
+    },
+    "validation": {
+      "loss": 0.29419410424154313,
+      "dynamics": 0.29033314302319385,
+      "dynamics_z": 0.14168139571537736,
+      "dynamics_concept": 0.24354656431518618,
+      "dynamics_belief": 0.3266145662694681,
+      "dynamics_uncertainty": 0.44949004567060313,
+      "semantic": 0.14037261097157588,
+      "diversity": 0.00938485036069741,
+      "fuzzy_entropy": 1.509477161970295,
+      "balance": 0.0037497901281372445,
+      "concept_probe": 0.08823465855150926
+    }
+  },
+  {
+    "epoch": 40,
+    "train": {
+      "loss": 0.048285375292203864,
+      "dynamics": 0.05227638447505175,
+      "dynamics_z": 0.04558087854969258,
+      "dynamics_concept": 0.06047768212322678,
+      "dynamics_belief": 0.0742633624705581,
+      "dynamics_uncertainty": 0.02878361499431182,
+      "semantic": 0.0765566525942817,
+      "diversity": 0.007922670404825891,
+      "fuzzy_entropy": 1.4854868212524726,
+      "balance": 0.0008154056520244031,
+      "concept_probe": 0.05607811217101253
+    },
+    "validation": {
+      "loss": 0.29994784515412126,
+      "dynamics": 0.2957569419360552,
+      "dynamics_z": 0.14177354803827943,
+      "dynamics_concept": 0.24856536969786786,
+      "dynamics_belief": 0.32281027783135896,
+      "dynamics_uncertainty": 0.469878579260873,
+      "semantic": 0.14304307762716637,
+      "diversity": 0.009399038250939767,
+      "fuzzy_entropy": 1.5057876227331943,
+      "balance": 0.006417656790648327,
+      "concept_probe": 0.0882067850897791
+    }
+  },
+  {
+    "epoch": 41,
+    "train": {
+      "loss": 0.04793554405700796,
+      "dynamics": 0.05192334791265276,
+      "dynamics_z": 0.04530949596961846,
+      "dynamics_concept": 0.06032120210251638,
+      "dynamics_belief": 0.07381855984389478,
+      "dynamics_uncertainty": 0.028244133824862693,
+      "semantic": 0.07665908473486803,
+      "diversity": 0.007940149603516092,
+      "fuzzy_entropy": 1.4861727536332852,
+      "balance": 0.0008126647318226323,
+      "concept_probe": 0.056057612202605425
+    },
+    "validation": {
+      "loss": 0.2958669205669497,
+      "dynamics": 0.29175132537474396,
+      "dynamics_z": 0.14924082050069434,
+      "dynamics_concept": 0.240121562461384,
+      "dynamics_belief": 0.3240256148283599,
+      "dynamics_uncertainty": 0.4536173167775889,
+      "semantic": 0.14252833276987076,
+      "diversity": 0.009414782991907636,
+      "fuzzy_entropy": 1.507791564112804,
+      "balance": 0.005893521636846612,
+      "concept_probe": 0.08822002603870924
+    }
+  },
+  {
+    "epoch": 42,
+    "train": {
+      "loss": 0.04785560575142807,
+      "dynamics": 0.051864457658815144,
+      "dynamics_z": 0.04524181206824676,
+      "dynamics_concept": 0.05984222013693379,
+      "dynamics_belief": 0.07364187627194488,
+      "dynamics_uncertainty": 0.028731922253168056,
+      "semantic": 0.07648294305010718,
+      "diversity": 0.00789817914542533,
+      "fuzzy_entropy": 1.4864908949453004,
+      "balance": 0.000836132769888666,
+      "concept_probe": 0.05608983865311863
+    },
+    "validation": {
+      "loss": 0.29769002340856143,
+      "dynamics": 0.293281686354856,
+      "dynamics_z": 0.14631622101439803,
+      "dynamics_concept": 0.24264481810272717,
+      "dynamics_belief": 0.32439491372616563,
+      "dynamics_uncertainty": 0.4597707859805373,
+      "semantic": 0.14505258178124664,
+      "diversity": 0.009449859073416132,
+      "fuzzy_entropy": 1.5042235949000373,
+      "balance": 0.006213327846871537,
+      "concept_probe": 0.08821373956552783
+    }
+  },
+  {
+    "epoch": 43,
+    "train": {
+      "loss": 0.047549669231687276,
+      "dynamics": 0.051564014792366296,
+      "dynamics_z": 0.044982643750477204,
+      "dynamics_concept": 0.05974412658156789,
+      "dynamics_belief": 0.0733929511862902,
+      "dynamics_uncertainty": 0.028136337736659512,
+      "semantic": 0.07645268910279383,
+      "diversity": 0.00787555725475279,
+      "fuzzy_entropy": 1.4863473684812079,
+      "balance": 0.0008126291367985612,
+      "concept_probe": 0.05603908801603378
+    },
+    "validation": {
+      "loss": 0.2894371103067867,
+      "dynamics": 0.2856539326613067,
+      "dynamics_z": 0.142299869143572,
+      "dynamics_concept": 0.2423173604441471,
+      "dynamics_belief": 0.32139397131615,
+      "dynamics_uncertainty": 0.43660452693212226,
+      "semantic": 0.13974875162859432,
+      "diversity": 0.009534693781103267,
+      "fuzzy_entropy": 1.511196834142091,
+      "balance": 0.0033424918226836646,
+      "concept_probe": 0.08820226522864866
+    }
+  },
+  {
+    "epoch": 44,
+    "train": {
+      "loss": 0.04735248592891255,
+      "dynamics": 0.051381854758578906,
+      "dynamics_z": 0.045028450851309666,
+      "dynamics_concept": 0.059730872521367,
+      "dynamics_belief": 0.07294876414484211,
+      "dynamics_uncertainty": 0.027819331359992525,
+      "semantic": 0.07635161147585937,
+      "diversity": 0.007859667637195361,
+      "fuzzy_entropy": 1.4869981338174976,
+      "balance": 0.0007758993505172394,
+      "concept_probe": 0.05609417551824329
+    },
+    "validation": {
+      "loss": 0.3014230540052789,
+      "dynamics": 0.2971606794439378,
+      "dynamics_z": 0.14245336844784315,
+      "dynamics_concept": 0.24276306553453694,
+      "dynamics_belief": 0.3222094373624833,
+      "dynamics_uncertainty": 0.4812168498508266,
+      "semantic": 0.14340946188227074,
+      "diversity": 0.009582883785249756,
+      "fuzzy_entropy": 1.5042285039776662,
+      "balance": 0.00734200501875555,
+      "concept_probe": 0.0882230199965053
+    }
+  },
+  {
+    "epoch": 45,
+    "train": {
+      "loss": 0.04726852788304796,
+      "dynamics": 0.05131584131253921,
+      "dynamics_z": 0.04488127926668646,
+      "dynamics_concept": 0.059607716989988575,
+      "dynamics_belief": 0.07281157157706972,
+      "dynamics_uncertainty": 0.027962797231097916,
+      "semantic": 0.0762369221133389,
+      "diversity": 0.007864558630936533,
+      "fuzzy_entropy": 1.4874775701639604,
+      "balance": 0.0008318335189405658,
+      "concept_probe": 0.056044475783650974
+    },
+    "validation": {
+      "loss": 0.3073033143262394,
+      "dynamics": 0.30308726307798606,
+      "dynamics_z": 0.1474794576891133,
+      "dynamics_concept": 0.23881513564313045,
+      "dynamics_belief": 0.3214350655430653,
+      "dynamics_uncertainty": 0.504619404429295,
+      "semantic": 0.14345069828092075,
+      "diversity": 0.009557875270237689,
+      "fuzzy_entropy": 1.5081859846584131,
+      "balance": 0.006054787690461171,
+      "concept_probe": 0.0882879766773005
+    }
+  },
+  {
+    "epoch": 46,
+    "train": {
+      "loss": 0.04703873077559532,
+      "dynamics": 0.051091808369573284,
+      "dynamics_z": 0.04497640139936489,
+      "dynamics_concept": 0.05958715937461476,
+      "dynamics_belief": 0.07244894399820846,
+      "dynamics_uncertainty": 0.027354728582562233,
+      "semantic": 0.0762215613254479,
+      "diversity": 0.007816698045792932,
+      "fuzzy_entropy": 1.4876897365463024,
+      "balance": 0.0008267956317820568,
+      "concept_probe": 0.056051208248019825
+    },
+    "validation": {
+      "loss": 0.299264949853303,
+      "dynamics": 0.2949590577942426,
+      "dynamics_z": 0.14189840462364134,
+      "dynamics_concept": 0.2387042098113748,
+      "dynamics_belief": 0.32062242558745085,
+      "dynamics_uncertainty": 0.47861119860508405,
+      "semantic": 0.14389040394396077,
+      "diversity": 0.0096124780715489,
+      "fuzzy_entropy": 1.5043688953899947,
+      "balance": 0.006848352243665789,
+      "concept_probe": 0.08822866542967128
+    }
+  },
+  {
+    "epoch": 47,
+    "train": {
+      "loss": 0.04689733763890607,
+      "dynamics": 0.050954096617975404,
+      "dynamics_z": 0.0447727454474614,
+      "dynamics_concept": 0.05936535222607912,
+      "dynamics_belief": 0.07221673632382739,
+      "dynamics_uncertainty": 0.027461552479285365,
+      "semantic": 0.0762282334819284,
+      "diversity": 0.007815508771811289,
+      "fuzzy_entropy": 1.488078669017675,
+      "balance": 0.0008445677011302311,
+      "concept_probe": 0.05603965886925556
+    },
+    "validation": {
+      "loss": 0.30337142211491946,
+      "dynamics": 0.29896944004004117,
+      "dynamics_z": 0.14627693874425576,
+      "dynamics_concept": 0.23662153203956415,
+      "dynamics_belief": 0.3193304099020411,
+      "dynamics_uncertainty": 0.49364888741344704,
+      "semantic": 0.1450239011987311,
+      "diversity": 0.009685111216834335,
+      "fuzzy_entropy": 1.5070622455878335,
+      "balance": 0.007101670655681461,
+      "concept_probe": 0.08829881753161793
+    }
+  },
+  {
+    "epoch": 48,
+    "train": {
+      "loss": 0.046856635962898026,
+      "dynamics": 0.05091790815967382,
+      "dynamics_z": 0.04487142655808402,
+      "dynamics_concept": 0.05918907706758806,
+      "dynamics_belief": 0.07199638007132679,
+      "dynamics_uncertainty": 0.02761474933608302,
+      "semantic": 0.07616930175572634,
+      "diversity": 0.007812200240049587,
+      "fuzzy_entropy": 1.4881206942456109,
+      "balance": 0.0008616867578856894,
+      "concept_probe": 0.05607554685248404
+    },
+    "validation": {
+      "loss": 0.29477072421644557,
+      "dynamics": 0.2903580948954723,
+      "dynamics_z": 0.14221347086742275,
+      "dynamics_concept": 0.23577939438038184,
+      "dynamics_belief": 0.3181663907942225,
+      "dynamics_uncertainty": 0.46527312451698744,
+      "semantic": 0.14492875960518103,
+      "diversity": 0.009747753484693707,
+      "fuzzy_entropy": 1.5058537467581328,
+      "balance": 0.008012007944835503,
+      "concept_probe": 0.08821571375563984
+    }
+  },
+  {
+    "epoch": 49,
+    "train": {
+      "loss": 0.04634010041493694,
+      "dynamics": 0.05042651728061693,
+      "dynamics_z": 0.04425538849199609,
+      "dynamics_concept": 0.058910410784717114,
+      "dynamics_belief": 0.0715884517650215,
+      "dynamics_uncertainty": 0.026951818142504413,
+      "semantic": 0.07597858933921979,
+      "diversity": 0.007789437025927996,
+      "fuzzy_entropy": 1.4884832434508266,
+      "balance": 0.000772647168077481,
+      "concept_probe": 0.05606715909528489
+    },
+    "validation": {
+      "loss": 0.30416311885489794,
+      "dynamics": 0.29987354820869006,
+      "dynamics_z": 0.14627595062627166,
+      "dynamics_concept": 0.23815647708099397,
+      "dynamics_belief": 0.31862134987213575,
+      "dynamics_uncertainty": 0.49644041598820293,
+      "semantic": 0.14421083167439602,
+      "diversity": 0.009573282597617049,
+      "fuzzy_entropy": 1.5087470089802977,
+      "balance": 0.006230157998497369,
+      "concept_probe": 0.08829983467327766
+    }
+  },
+  {
+    "epoch": 50,
+    "train": {
+      "loss": 0.0463868037094267,
+      "dynamics": 0.05045643717772803,
+      "dynamics_z": 0.044596883449323325,
+      "dynamics_concept": 0.05882063382590304,
+      "dynamics_belief": 0.07158823932844158,
+      "dynamics_uncertainty": 0.02681999247787254,
+      "semantic": 0.07622038805857301,
+      "diversity": 0.007759100563909707,
+      "fuzzy_entropy": 1.488982003258199,
+      "balance": 0.0008276918544689412,
+      "concept_probe": 0.056038306256262015
+    },
+    "validation": {
+      "loss": 0.30122492694463887,
+      "dynamics": 0.2968688944324118,
+      "dynamics_z": 0.15302779720943482,
+      "dynamics_concept": 0.2354843250063599,
+      "dynamics_belief": 0.31982084204916095,
+      "dynamics_uncertainty": 0.47914261065545627,
+      "semantic": 0.14441882452515306,
+      "diversity": 0.009861783674139469,
+      "fuzzy_entropy": 1.5059706285351613,
+      "balance": 0.007185262940885102,
+      "concept_probe": 0.08817827901573944
+    }
+  }
+]
