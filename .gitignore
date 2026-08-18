@@ -9,7 +9,6 @@ __pycache__/
 /cache/
 /data/models/
 /data/tuned_lens/
-/results/
 *.pt
 *.pth
 
