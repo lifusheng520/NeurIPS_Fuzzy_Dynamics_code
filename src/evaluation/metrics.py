@@ -14,6 +14,10 @@ from src.fuzzy_dynamics.config import REASONING_MODES
 STATE_COMPONENTS = ("z", "concept", "belief", "uncertainty")
 
 
+def _macro_defined(values: list[float | None]) -> float | None:
+    return sum(values) / len(values) if values and all(value is not None for value in values) else None
+
+
 def _validate_pair(predicted: torch.Tensor, target: torch.Tensor) -> None:
     if predicted.shape != target.shape:
         raise ValueError(
@@ -101,6 +105,17 @@ def reconstruction_metrics(
     for layer in range(predicted.shape[1]):
         layer_summary = _regression_summary(predicted[:, layer], target[:, layer])
         metrics["per_layer"].append({"layer": layer, **layer_summary})
+    layer_r2 = [entry["r2"] for entry in metrics["per_layer"]]
+    metrics["layer_macro_r2"] = _macro_defined(layer_r2)
+    requested_bands = {
+        "early_layers_0_8_macro_r2": (0, 9),
+        "middle_layers_9_17_macro_r2": (9, 18),
+        "late_layers_18_29_macro_r2": (18, 30),
+        "final_layers_30_31_macro_r2": (30, 32),
+    }
+    for name, (start, stop) in requested_bands.items():
+        selected = layer_r2[start : min(stop, len(layer_r2))]
+        metrics[name] = _macro_defined(selected) if start < len(layer_r2) else None
 
     if component_dimensions is not None:
         slices = _component_slices(component_dimensions, predicted.shape[-1])
@@ -158,6 +173,12 @@ def rollout_metrics(
                 **horizon_summary,
             }
         )
+    positive_horizon = 0
+    for entry in summary["per_horizon"]:
+        if entry["r2"] is None or entry["r2"] <= 0:
+            break
+        positive_horizon = int(entry["horizon"])
+    summary["positive_r2_horizon"] = positive_horizon
 
     if component_dimensions is not None:
         slices = _component_slices(component_dimensions, predicted.shape[-1])

@@ -159,6 +159,8 @@ def evaluate(
     totals: dict[str, float] = defaultdict(float)
     for batch in loader:
         outputs = model(move_batch(batch, device))
+        if loss_config.rollout_weight > 0:
+            model.add_short_rollout(outputs, loss_config.rollout_horizon)
         _, metrics = fuzzy_dynamics_loss(outputs, loss_config)
         for name, value in metrics.items():
             totals[name] += float(value)
@@ -306,6 +308,8 @@ def main() -> None:
         for batch_number, batch in enumerate(train_loader, start=1):
             optimizer.zero_grad(set_to_none=True)
             outputs = model(move_batch(batch, device))
+            if loss_config.rollout_weight > 0:
+                model.add_short_rollout(outputs, loss_config.rollout_horizon)
             loss, metrics = fuzzy_dynamics_loss(outputs, loss_config)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), training.get("gradient_clip", 1.0))

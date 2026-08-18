@@ -55,6 +55,24 @@ def diversity_loss(local_deltas: torch.Tensor, eps: float = 1e-8) -> torch.Tenso
     return torch.stack(terms).mean()
 
 
+def _block_balanced_mse(
+    predicted: torch.Tensor,
+    target: torch.Tensor,
+    scale: torch.Tensor,
+    dimensions: dict[str, int],
+) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    standardized_error = (predicted - target) / scale.detach()
+    block_losses: dict[str, torch.Tensor] = {}
+    start = 0
+    for name in ("z", "concept", "belief", "uncertainty"):
+        width = int(dimensions[name])
+        block_losses[name] = standardized_error[..., start : start + width].square().mean()
+        start += width
+    if start != predicted.shape[-1]:
+        raise ValueError("State-component dimensions do not match prediction width.")
+    return torch.stack(tuple(block_losses.values())).mean(), block_losses
+
+
 def fuzzy_dynamics_loss(
     outputs: dict[str, torch.Tensor], config: LossConfig
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
@@ -67,16 +85,29 @@ def fuzzy_dynamics_loss(
         raise ValueError("Block-balanced dynamics requires delta scales and dimensions.")
     if not torch.isfinite(scale).all() or torch.any(scale <= 0):
         raise ValueError("State delta scales must be finite and positive.")
-    standardized_error = (predicted_delta - target_delta) / scale.detach()
-    block_losses: dict[str, torch.Tensor] = {}
-    start = 0
-    for name in ("z", "concept", "belief", "uncertainty"):
-        width = int(dimensions[name])
-        block_losses[name] = standardized_error[..., start : start + width].square().mean()
-        start += width
-    if start != predicted_delta.shape[-1]:
-        raise ValueError("State-component dimensions do not match predicted_delta.")
-    dynamics = torch.stack(tuple(block_losses.values())).mean()
+    dynamics, block_losses = _block_balanced_mse(
+        predicted_delta, target_delta, scale, dimensions
+    )
+
+    rollout = torch.zeros((), device=predicted_delta.device)
+    rollout_horizons: dict[str, torch.Tensor] = {}
+    if config.rollout_weight > 0:
+        predicted_states = outputs.get("short_rollout_predicted_states")
+        target_states = outputs.get("short_rollout_target_states")
+        if predicted_states is None or target_states is None:
+            raise ValueError("Positive rollout_weight requires a differentiable short rollout.")
+        if predicted_states.shape != target_states.shape:
+            raise ValueError("Short-rollout predictions and targets must have matching shapes.")
+        if predicted_states.shape[1] != config.rollout_horizon + 1:
+            raise ValueError("Short-rollout output does not match rollout_horizon.")
+        horizon_losses = []
+        for horizon in range(2, config.rollout_horizon + 1):
+            value, _ = _block_balanced_mse(
+                predicted_states[:, horizon], target_states[:, horizon], scale, dimensions
+            )
+            rollout_horizons[f"rollout_h{horizon}"] = value
+            horizon_losses.append(value)
+        rollout = torch.stack(horizon_losses).mean()
 
     prior = semantic_reasoning_prior(outputs, config.semantic_temperature)
     semantic = (prior * (prior.clamp_min(1e-8).log() - memberships.log())).sum(-1).mean()
@@ -99,6 +130,7 @@ def fuzzy_dynamics_loss(
 
     total = (
         config.dynamics_weight * dynamics
+        + config.rollout_weight * rollout
         + config.semantic_weight * semantic
         + config.diversity_weight * diversity
         + config.fuzzy_entropy_weight * fuzzy_entropy
@@ -109,6 +141,8 @@ def fuzzy_dynamics_loss(
         "loss": total.detach(),
         "dynamics": dynamics.detach(),
         **{f"dynamics_{name}": value.detach() for name, value in block_losses.items()},
+        "rollout": rollout.detach(),
+        **{name: value.detach() for name, value in rollout_horizons.items()},
         "semantic": semantic.detach(),
         "diversity": diversity.detach(),
         "fuzzy_entropy": (-fuzzy_entropy).detach(),

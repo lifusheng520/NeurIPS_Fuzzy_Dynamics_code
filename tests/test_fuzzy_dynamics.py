@@ -17,8 +17,11 @@ from src.fuzzy_dynamics import (
 class IdenticalZDynamics(nn.Module):
     """Every mode predicts delta-z=z and zero for all other state blocks."""
 
-    def forward(self, z, concept, belief, uncertainty, attention, mlp, concept_change):
-        del concept, belief, uncertainty, attention, mlp, concept_change
+    def forward(
+        self, z, concept, belief, uncertainty, attention, mlp, concept_change,
+        layer_position=None,
+    ):
+        del concept, belief, uncertainty, attention, mlp, concept_change, layer_position
         delta = torch.zeros(*z.shape[:-1], 4, device=z.device, dtype=z.dtype)
         delta[..., 0] = z[..., 0]
         return delta.unsqueeze(-2).expand(*delta.shape[:-1], 5, 4)
@@ -131,6 +134,54 @@ class FuzzyDynamicsTest(unittest.TestCase):
             self.assertIn(f"dynamics_{name}", metrics)
         loss.backward()
         self.assertTrue(any(parameter.grad is not None for parameter in model.parameters()))
+
+    def test_layer_condition_and_short_rollout_are_differentiable(self) -> None:
+        batch_size, layers, hidden_size, belief_size = 3, 5, 8, 4
+        config = FuzzyDynamicsConfig(
+            hidden_size=hidden_size,
+            belief_input_dim=belief_size,
+            vocab_size=19,
+            z_dim=3,
+            concept_dim=2,
+            belief_dim=2,
+            operation_dim=3,
+            dynamics_hidden_dim=7,
+            dynamics_dropout=0.0,
+            use_layer_condition=True,
+        )
+        model = FuzzyReasoningDynamics(config)
+        batch = {
+            "hidden": torch.randn(batch_size, layers + 1, hidden_size),
+            "attention": torch.randn(batch_size, layers, hidden_size),
+            "mlp": torch.randn(batch_size, layers, hidden_size),
+            "belief": torch.randn(batch_size, layers + 1, belief_size),
+            "uncertainty": torch.rand(batch_size, layers + 1, 1),
+        }
+        model.fit_state_projectors(
+            batch["hidden"].reshape(-1, hidden_size),
+            batch["belief"].reshape(-1, belief_size),
+        )
+        outputs = model(batch)
+        self.assertTrue(
+            torch.allclose(
+                outputs["layer_position"][0, :, 0],
+                torch.linspace(0.0, 1.0, layers),
+            )
+        )
+        model.add_short_rollout(outputs, horizon=4)
+        self.assertEqual(
+            outputs["short_rollout_predicted_states"].shape,
+            (batch_size, 5, config.state_dim),
+        )
+        loss, metrics = fuzzy_dynamics_loss(
+            outputs, LossConfig(rollout_weight=0.25, rollout_horizon=4)
+        )
+        self.assertTrue(torch.isfinite(loss))
+        self.assertIn("rollout_h4", metrics)
+        loss.backward()
+        self.assertIsNotNone(
+            model.local_dynamics.knowledge_enrichment.network[-1].weight.grad
+        )
 
 
 if __name__ == "__main__":

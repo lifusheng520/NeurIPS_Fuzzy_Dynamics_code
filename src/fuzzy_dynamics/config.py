@@ -28,6 +28,7 @@ class FuzzyDynamicsConfig:
     projector_dropout: float = 0.0
     dynamics_dropout: float = 0.1
     membership_temperature: float = 1.0
+    use_layer_condition: bool = False
 
     @property
     def state_dim(self) -> int:
@@ -54,6 +55,8 @@ class LossConfig:
     balance_weight: float = 0.01
     concept_probe_weight: float = 0.05
     semantic_temperature: float = 1.0
+    rollout_weight: float = 0.0
+    rollout_horizon: int = 4
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

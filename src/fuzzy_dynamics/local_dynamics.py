@@ -33,25 +33,28 @@ class LocalReasoningDynamics(nn.Module):
         state_dim: int,
         hidden_dim: int,
         dropout: float,
+        use_layer_condition: bool = False,
     ) -> None:
         super().__init__()
+        self.use_layer_condition = use_layer_condition
+        condition_dim = int(use_layer_condition)
         self.knowledge_enrichment = DynamicsMLP(
-            z_dim + operation_dim, hidden_dim, state_dim, dropout
+            z_dim + operation_dim + condition_dim, hidden_dim, state_dim, dropout
         )
         self.information_routing = DynamicsMLP(
-            z_dim + operation_dim, hidden_dim, state_dim, dropout
+            z_dim + operation_dim + condition_dim, hidden_dim, state_dim, dropout
         )
         self.concept_composition = DynamicsMLP(
-            z_dim + concept_dim + 3 * operation_dim,
+            z_dim + concept_dim + 3 * operation_dim + condition_dim,
             hidden_dim,
             state_dim,
             dropout,
         )
         self.prediction_refinement = DynamicsMLP(
-            z_dim + belief_dim + 1, hidden_dim, state_dim, dropout
+            z_dim + belief_dim + 1 + condition_dim, hidden_dim, state_dim, dropout
         )
         self.hop_transition = DynamicsMLP(
-            z_dim + 2 * concept_dim + operation_dim,
+            z_dim + 2 * concept_dim + operation_dim + condition_dim,
             hidden_dim,
             state_dim,
             dropout,
@@ -66,15 +69,23 @@ class LocalReasoningDynamics(nn.Module):
         attention: torch.Tensor,
         mlp: torch.Tensor,
         concept_change: torch.Tensor,
+        layer_position: torch.Tensor | None = None,
     ) -> torch.Tensor:
-        f1 = self.knowledge_enrichment(torch.cat((z, mlp), dim=-1))
-        f2 = self.information_routing(torch.cat((z, attention), dim=-1))
+        if self.use_layer_condition:
+            if layer_position is None or layer_position.shape != (*z.shape[:-1], 1):
+                raise ValueError("Layer-conditioned dynamics requires tau with shape [..., 1].")
+            condition = (layer_position,)
+        else:
+            condition = ()
+        f1 = self.knowledge_enrichment(torch.cat((z, mlp, *condition), dim=-1))
+        f2 = self.information_routing(torch.cat((z, attention, *condition), dim=-1))
         f3 = self.concept_composition(
-            torch.cat((z, concept, attention, mlp, attention * mlp), dim=-1)
+            torch.cat((z, concept, attention, mlp, attention * mlp, *condition), dim=-1)
         )
-        f4 = self.prediction_refinement(torch.cat((z, belief, uncertainty), dim=-1))
+        f4 = self.prediction_refinement(
+            torch.cat((z, belief, uncertainty, *condition), dim=-1)
+        )
         f5 = self.hop_transition(
-            torch.cat((z, concept, concept_change, attention), dim=-1)
+            torch.cat((z, concept, concept_change, attention, *condition), dim=-1)
         )
         return torch.stack((f1, f2, f3, f4, f5), dim=-2)
-

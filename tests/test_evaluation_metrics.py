@@ -78,6 +78,7 @@ class EvaluationMetricsTest(unittest.TestCase):
         self.assertAlmostEqual(result["components"]["belief"]["r2"], 1.0)
         self.assertAlmostEqual(result["components"]["uncertainty"]["r2"], 0.8)
         self.assertAlmostEqual(result["macro_r2"], 0.7)
+        self.assertIsNone(result["layer_macro_r2"])
 
     def test_constant_block_has_undefined_r2_without_nan(self) -> None:
         target = torch.tensor(
@@ -186,6 +187,7 @@ class EvaluationMetricsTest(unittest.TestCase):
         self.assertAlmostEqual(result["per_horizon"][0]["mse"], 0.25)
         self.assertAlmostEqual(result["per_horizon"][1]["mse"], 2.25)
         self.assertAlmostEqual(result["final_state_mse"], 2.25)
+        self.assertEqual(result["positive_r2_horizon"], 0)
 
 
 if __name__ == "__main__":
