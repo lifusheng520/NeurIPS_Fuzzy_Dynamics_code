@@ -59,7 +59,24 @@ def fuzzy_dynamics_loss(
     outputs: dict[str, torch.Tensor], config: LossConfig
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
     memberships = outputs["memberships"].clamp_min(1e-8)
-    dynamics = F.mse_loss(outputs["predicted_delta"], outputs["target_delta"])
+    predicted_delta = outputs["predicted_delta"]
+    target_delta = outputs["target_delta"]
+    scale = outputs.get("state_delta_scale")
+    dimensions = outputs.get("component_dimensions")
+    if scale is None or dimensions is None:
+        raise ValueError("Block-balanced dynamics requires delta scales and dimensions.")
+    if not torch.isfinite(scale).all() or torch.any(scale <= 0):
+        raise ValueError("State delta scales must be finite and positive.")
+    standardized_error = (predicted_delta - target_delta) / scale.detach()
+    block_losses: dict[str, torch.Tensor] = {}
+    start = 0
+    for name in ("z", "concept", "belief", "uncertainty"):
+        width = int(dimensions[name])
+        block_losses[name] = standardized_error[..., start : start + width].square().mean()
+        start += width
+    if start != predicted_delta.shape[-1]:
+        raise ValueError("State-component dimensions do not match predicted_delta.")
+    dynamics = torch.stack(tuple(block_losses.values())).mean()
 
     prior = semantic_reasoning_prior(outputs, config.semantic_temperature)
     semantic = (prior * (prior.clamp_min(1e-8).log() - memberships.log())).sum(-1).mean()
@@ -91,6 +108,7 @@ def fuzzy_dynamics_loss(
     metrics = {
         "loss": total.detach(),
         "dynamics": dynamics.detach(),
+        **{f"dynamics_{name}": value.detach() for name, value in block_losses.items()},
         "semantic": semantic.detach(),
         "diversity": diversity.detach(),
         "fuzzy_entropy": (-fuzzy_entropy).detach(),

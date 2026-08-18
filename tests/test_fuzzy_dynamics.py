@@ -85,6 +85,10 @@ class FuzzyDynamicsTest(unittest.TestCase):
             "belief": torch.randn(batch_size, layers + 1, belief_size),
             "uncertainty": torch.rand(batch_size, layers + 1, 1),
         }
+        model.fit_state_projectors(
+            batch["hidden"].reshape(-1, hidden_size),
+            batch["belief"].reshape(-1, belief_size),
+        )
         outputs = model(batch)
         self.assertEqual(outputs["states"].shape, (batch_size, layers + 1, config.state_dim))
         self.assertEqual(outputs["local_deltas"].shape, (batch_size, layers, 5, config.state_dim))
@@ -123,6 +127,8 @@ class FuzzyDynamicsTest(unittest.TestCase):
         loss, metrics = fuzzy_dynamics_loss(outputs, LossConfig())
         self.assertTrue(torch.isfinite(loss))
         self.assertIn("dynamics", metrics)
+        for name in ("z", "concept", "belief", "uncertainty"):
+            self.assertIn(f"dynamics_{name}", metrics)
         loss.backward()
         self.assertTrue(any(parameter.grad is not None for parameter in model.parameters()))
 

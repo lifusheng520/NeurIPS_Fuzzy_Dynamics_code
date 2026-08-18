@@ -42,6 +42,21 @@ class FuzzyReasoningDynamics(nn.Module):
             temperature=config.membership_temperature,
         )
         self.bridge_concept_probe = nn.Linear(config.concept_dim, 1)
+        self.register_buffer("state_delta_scale", torch.ones(config.state_dim))
+        self.register_buffer("state_delta_scale_fitted", torch.tensor(False))
+
+    @torch.no_grad()
+    def fit_state_projectors(
+        self, hidden_samples: torch.Tensor, belief_samples: torch.Tensor
+    ) -> None:
+        self.projectors.fit_state_projectors(hidden_samples, belief_samples)
+
+    @torch.no_grad()
+    def set_state_delta_scale(self, scale: torch.Tensor) -> None:
+        if scale.shape != (self.config.state_dim,):
+            raise ValueError(f"Expected state delta scale [{self.config.state_dim}].")
+        self.state_delta_scale.copy_(scale.to(self.state_delta_scale).clamp_min(1e-4))
+        self.state_delta_scale_fitted.fill_(True)
 
     def _project_batch(
         self, batch: dict[str, torch.Tensor]
@@ -61,8 +76,7 @@ class FuzzyReasoningDynamics(nn.Module):
         belief_raw = batch["belief"]
         uncertainty_raw = batch["uncertainty"]
 
-        z = self.projectors.hidden(hidden)
-        concept = self.projectors.concept(hidden)
+        z, concept = self.projectors.hidden_and_concept(hidden)
         belief = self.projectors.belief(belief_raw)
         attention = self.projectors.attention(attention_raw)
         mlp = self.projectors.mlp(mlp_raw)
@@ -108,6 +122,13 @@ class FuzzyReasoningDynamics(nn.Module):
             "memberships": memberships,
             "predicted_delta": predicted_delta,
             "target_delta": target_delta,
+            "state_delta_scale": self.state_delta_scale,
+            "component_dimensions": {
+                "z": self.config.z_dim,
+                "concept": self.config.concept_dim,
+                "belief": self.config.belief_dim,
+                "uncertainty": 1,
+            },
         }
         for name in ("bridge_logprob", "answer_logprob", "margin"):
             if name in batch:

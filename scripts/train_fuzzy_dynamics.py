@@ -74,6 +74,50 @@ def mean_metrics(totals: dict[str, float], batches: int) -> dict[str, float]:
     return {name: value / max(1, batches) for name, value in totals.items()}
 
 
+def sample_training_states(
+    cache: dict[str, Any],
+    train_indices: list[int],
+    sample_count: int,
+    seed: int,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Sample aligned states across training trajectories and all layers for PCA."""
+    layers = int(cache["hidden"].shape[1])
+    total = len(train_indices) * layers
+    count = min(sample_count, total)
+    if count <= 0:
+        raise ValueError("projector_fit_samples must be positive.")
+    generator = torch.Generator().manual_seed(seed)
+    positions = torch.randperm(total, generator=generator)[:count]
+    train_lookup = torch.tensor(train_indices, dtype=torch.long)
+    trajectories = train_lookup[positions // layers]
+    layer_indices = positions % layers
+    return (
+        cache["hidden"][trajectories, layer_indices],
+        cache["belief"][trajectories, layer_indices],
+    )
+
+
+@torch.no_grad()
+def fit_state_delta_scale(
+    model: FuzzyReasoningDynamics, loader: DataLoader, device: torch.device
+) -> torch.Tensor:
+    """Fit per-coordinate delta standard deviations using only the training split."""
+    model.eval()
+    total = torch.zeros(model.config.state_dim, dtype=torch.float64, device=device)
+    total_square = torch.zeros_like(total)
+    count = 0
+    for batch in loader:
+        states, *_ = model._project_batch(move_batch(batch, device))
+        delta = (states[:, 1:] - states[:, :-1]).to(torch.float64)
+        total += delta.sum(dim=(0, 1))
+        total_square += delta.square().sum(dim=(0, 1))
+        count += delta.shape[0] * delta.shape[1]
+    if count == 0:
+        raise ValueError("Cannot fit state delta scales from an empty training loader.")
+    variance = (total_square / count - (total / count).square()).clamp_min(0.0)
+    return variance.sqrt().to(torch.float32)
+
+
 def split_indices(
     count: int,
     metadata: list[dict[str, Any]],
@@ -201,6 +245,23 @@ def main() -> None:
     )
 
     model = FuzzyReasoningDynamics(model_config).to(device)
+    projector_fit_samples = int(training.get("projector_fit_samples", 8192))
+    hidden_samples, belief_samples = sample_training_states(
+        cache, train_indices, projector_fit_samples, args.seed
+    )
+    logger.info(
+        "Fitting shared frozen PCA projectors on %d training states across all layers",
+        hidden_samples.shape[0],
+    )
+    model.fit_state_projectors(hidden_samples, belief_samples)
+    delta_scale = fit_state_delta_scale(model, train_loader, device)
+    model.set_state_delta_scale(delta_scale)
+    logger.info(
+        "Fitted block-balanced delta scales: min=%.6g median=%.6g max=%.6g",
+        float(delta_scale.min()),
+        float(delta_scale.median()),
+        float(delta_scale.max()),
+    )
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=training["learning_rate"],

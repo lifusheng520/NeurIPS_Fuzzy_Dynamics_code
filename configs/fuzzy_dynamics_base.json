@@ -24,6 +24,7 @@
     "learning_rate": 0.001,
     "weight_decay": 0.0001,
     "gradient_clip": 1.0,
+    "projector_fit_samples": 8192,
     "validation_fraction": 0.1,
     "split_by": "category"
   }

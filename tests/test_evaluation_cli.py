@@ -62,6 +62,10 @@ class EvaluationCliTest(unittest.TestCase):
             }
             torch.save(cache, cache_path)
             model = FuzzyReasoningDynamics(config)
+            model.fit_state_projectors(
+                cache["hidden"][:2].reshape(-1, config.hidden_size),
+                cache["belief"][:2].reshape(-1, config.belief_input_dim),
+            )
             split_path = training_dir / "split.json"
             checkpoint = model.checkpoint(
                 source_activations=str(cache_path.resolve()),
