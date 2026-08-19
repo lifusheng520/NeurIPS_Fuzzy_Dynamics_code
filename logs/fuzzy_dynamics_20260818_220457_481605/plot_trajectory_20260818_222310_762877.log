@@ -1,0 +1,4 @@
+2026-08-18 22:23:10 | INFO | Log file: /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs/fuzzy_dynamics_20260818_220457_481605/plot_trajectory_20260818_222310_762877.log
+2026-08-18 22:23:10 | INFO | Arguments: {'trajectories': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260818_220457_481605/evaluation/trajectories.jsonl', 'index': 0, 'output': None, 'experiment_time': '20260818_220457_481605', 'log_dir': '/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs'}
+2026-08-18 22:23:10 | INFO | experiment_time=20260818_220457_481605
+2026-08-18 22:23:13 | INFO | Saved /bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260818_220457_481605/evaluation/trajectory_0.png
