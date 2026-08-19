@@ -8,6 +8,7 @@ import torch
 import torch.nn.functional as F
 
 from .config import LossConfig
+from .semantic_scores import prediction_refinement_score, route_score
 
 
 def _standardize_signal(values: torch.Tensor, eps: float = 1e-6) -> torch.Tensor:
@@ -21,10 +22,11 @@ def semantic_reasoning_prior(
 ) -> torch.Tensor:
     """Construct rho from operation magnitudes, commitment, and concept shifts."""
     enrichment = outputs["mlp"].norm(dim=-1)
-    routing = outputs["attention"].norm(dim=-1)
+    routing = route_score(outputs["attention"])
     composition = (outputs["attention"] * outputs["mlp"]).norm(dim=-1)
-    uncertainty = outputs["uncertainty"].squeeze(-1)
-    commitment = uncertainty[:, :-1] - uncertainty[:, 1:]
+    commitment = prediction_refinement_score(
+        outputs["margin"], outputs["uncertainty"]
+    )
     hop = outputs["concept_change"].norm(dim=-1)
     if "bridge_logprob" in outputs:
         bridge_raw = outputs["bridge_logprob"].squeeze(-1)
@@ -34,13 +36,6 @@ def semantic_reasoning_prior(
         bridge_change = torch.where(bridge_valid, bridge_change, torch.zeros_like(bridge_change))
         composition = composition + bridge_change.clamp_min(0.0)
         hop = hop + bridge_change.abs()
-    if "answer_logprob" in outputs:
-        answer_raw = outputs["answer_logprob"].squeeze(-1)
-        answer_valid = torch.isfinite(answer_raw[:, 1:]) & torch.isfinite(answer_raw[:, :-1])
-        answer = torch.nan_to_num(answer_raw, nan=0.0)
-        answer_change = answer[:, 1:] - answer[:, :-1]
-        answer_change = torch.where(answer_valid, answer_change, torch.zeros_like(answer_change))
-        commitment = commitment + answer_change.clamp_min(0.0)
     scores = torch.stack((enrichment, routing, composition, commitment, hop), dim=-1)
     scores = _standardize_signal(scores)
     return torch.softmax(scores / max(temperature, 1e-6), dim=-1)

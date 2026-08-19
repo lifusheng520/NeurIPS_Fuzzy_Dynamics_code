@@ -9,8 +9,8 @@ import torch
 from torch.utils.data import Dataset
 
 
-REQUIRED_TENSORS = ("hidden", "attention", "mlp", "belief", "uncertainty")
-OPTIONAL_TENSORS = ("bridge_logprob", "answer_logprob", "margin")
+REQUIRED_TENSORS = ("hidden", "attention", "mlp", "belief", "uncertainty", "margin")
+OPTIONAL_TENSORS = ("bridge_logprob", "answer_logprob")
 
 
 def validate_activation_cache(cache: dict[str, Any]) -> None:
@@ -30,6 +30,12 @@ def validate_activation_cache(cache: dict[str, Any]) -> None:
         raise ValueError("belief must align with every hidden state.")
     if cache["uncertainty"].shape[:2] != hidden.shape[:2]:
         raise ValueError("uncertainty must align with every hidden state.")
+    for name in ("uncertainty", "margin"):
+        if cache[name].shape != (*hidden.shape[:2], 1):
+            raise ValueError(f"{name} must have shape [N, L+1, 1].")
+    for name in OPTIONAL_TENSORS:
+        if name in cache and cache[name].shape != (*hidden.shape[:2], 1):
+            raise ValueError(f"{name} must have shape [N, L+1, 1].")
 
 
 def load_activation_cache(path: str | Path) -> dict[str, Any]:

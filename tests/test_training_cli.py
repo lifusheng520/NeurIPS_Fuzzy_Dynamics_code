@@ -29,6 +29,7 @@ class TrainingCliTest(unittest.TestCase):
                     "mlp": torch.randn(queries, layers, 4, generator=generator),
                     "belief": torch.randn(queries, layers + 1, 2, generator=generator),
                     "uncertainty": torch.rand(queries, layers + 1, 1, generator=generator),
+                    "margin": torch.rand(queries, layers + 1, 1, generator=generator),
                     "metadata": [
                         {"uid": f"q{index}", "category": f"c{index // 2}"}
                         for index in range(queries)

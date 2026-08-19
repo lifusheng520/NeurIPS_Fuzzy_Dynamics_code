@@ -54,6 +54,17 @@ s_l = concat(z_l, c_l, b_l, u_l / log(|V|))
 Attention and MLP operation features are kept outside the state and passed to
 the local systems as `a_l` and `m_l`.
 
+The paper's routing and prediction-refinement scores are implemented explicitly as
+
+```text
+RouteScore(a_l) = ||a_l||_2
+phi_A(x, y) = sqrt(max(x, 0) * max(y, 0))
+r^A_l = phi_A(gamma_{l+1} - gamma_l, u_l - u_{l+1})
+```
+
+Here `gamma_l` is the top-1/top-2 probability margin. The same `phi_A` implementation
+is shared by the training semantic prior and automatic semantic evaluation.
+
 ## Five local systems
 
 `LocalReasoningDynamics` uses separate parameters and inputs:
@@ -138,8 +149,8 @@ the observed LLM trajectory. It must therefore be described as an
 operation-conditioned rollout, not an autonomous rollout.
 
 Automatic semantic events implement the document's first-token bridge
-emergence (F3), joint answer increase/uncertainty decrease (F4), and joint
-bridge decrease/answer increase (F5) definitions. These signals overlap with
+emergence (F3), joint top-1/top-2 margin increase and uncertainty decrease
+(F4), and joint bridge decrease/answer increase (F5) definitions. These signals overlap with
 the semantic training prior. They are diagnostic proxy agreement, not
 independent semantic validation. By default, a positive joint signal must also
 fall in that query's top quartile; `--semantic-event-quantile` records and

@@ -30,7 +30,7 @@ class IdenticalZDynamics(nn.Module):
 class FuzzyDynamicsTest(unittest.TestCase):
     def test_conditional_rollout_uses_predicted_not_true_intermediate_state(self) -> None:
         config = FuzzyDynamicsConfig(
-            hidden_size=1,
+            hidden_size=2,
             belief_input_dim=1,
             vocab_size=2,
             z_dim=1,
@@ -87,6 +87,7 @@ class FuzzyDynamicsTest(unittest.TestCase):
             "mlp": torch.randn(batch_size, layers, hidden_size),
             "belief": torch.randn(batch_size, layers + 1, belief_size),
             "uncertainty": torch.rand(batch_size, layers + 1, 1),
+            "margin": torch.rand(batch_size, layers + 1, 1),
         }
         model.fit_state_projectors(
             batch["hidden"].reshape(-1, hidden_size),
@@ -156,6 +157,7 @@ class FuzzyDynamicsTest(unittest.TestCase):
             "mlp": torch.randn(batch_size, layers, hidden_size),
             "belief": torch.randn(batch_size, layers + 1, belief_size),
             "uncertainty": torch.rand(batch_size, layers + 1, 1),
+            "margin": torch.rand(batch_size, layers + 1, 1),
         }
         model.fit_state_projectors(
             batch["hidden"].reshape(-1, hidden_size),

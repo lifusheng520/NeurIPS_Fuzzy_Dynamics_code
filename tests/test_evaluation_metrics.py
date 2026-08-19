@@ -15,9 +15,28 @@ from src.evaluation import (
     semantic_alignment_metrics,
 )
 from src.evaluation.events import load_semantic_event_definitions
+from src.fuzzy_dynamics import phi_a, prediction_refinement_score, route_score
 
 
 class EvaluationMetricsTest(unittest.TestCase):
+    def test_paper_semantic_score_definitions(self) -> None:
+        attention = torch.tensor([[[3.0, 4.0], [5.0, 12.0]]])
+        self.assertTrue(torch.equal(route_score(attention), torch.tensor([[5.0, 13.0]])))
+
+        gamma_change = torch.tensor([[-0.2, 0.4, 0.9]])
+        uncertainty_drop = torch.tensor([[0.5, -0.3, 0.4]])
+        expected = torch.tensor([[0.0, 0.0, 0.6]])
+        self.assertTrue(torch.allclose(phi_a(gamma_change, uncertainty_drop), expected))
+
+        margin = torch.tensor([[[0.1], [0.0], [0.4], [0.9]]])
+        uncertainty = torch.tensor([[[0.8], [0.3], [0.5], [0.1]]])
+        self.assertTrue(
+            torch.allclose(
+                prediction_refinement_score(margin, uncertainty),
+                torch.tensor([[0.0, 0.0, 0.4472136]]),
+            )
+        )
+
     def test_external_events_align_by_uid_not_row_offset(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "events.jsonl"
@@ -133,6 +152,7 @@ class EvaluationMetricsTest(unittest.TestCase):
         bridge = torch.tensor([[[-4.0], [-3.0], [-2.0], [-3.0], [-4.0]]])
         answer = torch.tensor([[[-4.0], [-5.0], [-4.0], [-3.0], [-2.0]]])
         uncertainty = torch.tensor([[[0.8], [0.6], [0.4], [0.6], [0.4]]])
+        margin = torch.tensor([[[0.4], [0.3], [0.5], [0.7], [0.9]]])
         memberships = torch.tensor(
             [
                 [
@@ -147,6 +167,7 @@ class EvaluationMetricsTest(unittest.TestCase):
             torch.zeros(1, 4, 2),
             torch.zeros(1, 4, 2),
             uncertainty,
+            margin,
             bridge_logprob=bridge,
             answer_logprob=answer,
         )

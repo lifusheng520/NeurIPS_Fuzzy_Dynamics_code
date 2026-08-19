@@ -279,6 +279,7 @@ def main() -> None:
     raw_attention: list[torch.Tensor] = []
     raw_mlp: list[torch.Tensor] = []
     uncertainty: list[torch.Tensor] = []
+    margin: list[torch.Tensor] = []
     bridge_logprob: list[torch.Tensor] = []
     answer_logprob: list[torch.Tensor] = []
     all_records: list[dict[str, Any]] = []
@@ -289,8 +290,8 @@ def main() -> None:
         for batch_number, start in enumerate(starts, start=1):
             batch_indices = indices[start : start + args.batch_size]
             index_tensor = torch.tensor(batch_indices, dtype=torch.long)
-            names = ("hidden", "attention", "mlp", "belief", "uncertainty")
-            optional_names = ("bridge_logprob", "answer_logprob", "margin")
+            names = ("hidden", "attention", "mlp", "belief", "uncertainty", "margin")
+            optional_names = ("bridge_logprob", "answer_logprob")
             batch = {
                 name: cache[name].index_select(0, index_tensor).to(device) for name in names
             }
@@ -329,6 +330,7 @@ def main() -> None:
                 raw_attention.append(batch["attention"].cpu())
                 raw_mlp.append(batch["mlp"].cpu())
                 uncertainty.append(batch["uncertainty"].cpu())
+                margin.append(batch["margin"].cpu())
                 if "bridge_logprob" in batch:
                     bridge_logprob.append(batch["bridge_logprob"].cpu())
                 if "answer_logprob" in batch:
@@ -369,6 +371,7 @@ def main() -> None:
                 torch.cat(raw_attention),
                 torch.cat(raw_mlp),
                 torch.cat(uncertainty),
+                torch.cat(margin),
                 bridge_logprob=torch.cat(bridge_logprob) if bridge_logprob else None,
                 answer_logprob=torch.cat(answer_logprob) if answer_logprob else None,
                 include_operation_proxies=args.include_operation_proxies,
@@ -378,7 +381,13 @@ def main() -> None:
                 "independent_of_training": False,
                 "layer_axis": "transition_s_l_to_s_l_plus_1",
                 "include_operation_proxies": args.include_operation_proxies,
-                "first_token_bridge_and_answer_scores": True,
+                "prediction_refinement_score": (
+                    "sqrt(relu(margin_change)*relu(uncertainty_drop))"
+                ),
+                "bridge_and_answer_scores_used_for": [
+                    "concept_composition",
+                    "hop_transition",
+                ],
             }
         semantic_alignment = semantic_alignment_metrics(
             memberships_tensor,
@@ -387,7 +396,7 @@ def main() -> None:
         )
 
     manifest = {
-        "schema_version": 2,
+        "schema_version": 3,
         "experiment_time": experiment_time,
         "checkpoint": str(_resolved(args.checkpoint)),
         "activations": str(_resolved(args.activations)),
@@ -398,7 +407,7 @@ def main() -> None:
         "semantic_events": event_manifest,
     }
     metrics = {
-        "schema_version": 2,
+        "schema_version": 3,
         "evaluation": manifest,
         "fidelity": fidelity,
         "semantic_alignment": semantic_alignment,

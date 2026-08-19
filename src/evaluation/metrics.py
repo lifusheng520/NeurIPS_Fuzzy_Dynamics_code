@@ -9,6 +9,7 @@ import torch
 import torch.nn.functional as F
 
 from src.fuzzy_dynamics.config import REASONING_MODES
+from src.fuzzy_dynamics.semantic_scores import prediction_refinement_score, route_score
 
 
 STATE_COMPONENTS = ("z", "concept", "belief", "uncertainty")
@@ -290,6 +291,7 @@ def automatic_semantic_event_scores(
     attention: torch.Tensor,
     mlp: torch.Tensor,
     uncertainty: torch.Tensor,
+    margin: torch.Tensor,
     bridge_logprob: torch.Tensor | None = None,
     answer_logprob: torch.Tensor | None = None,
     include_operation_proxies: bool = False,
@@ -306,7 +308,8 @@ def automatic_semantic_event_scores(
     if attention.ndim != 3 or mlp.shape != attention.shape:
         raise ValueError("attention and mlp must have matching [queries, layers, dim] shapes.")
     num_layers = attention.shape[1]
-    uncertainty_values = _scalar_layers(uncertainty, num_layers + 1, "uncertainty")
+    _scalar_layers(uncertainty, num_layers + 1, "uncertainty")
+    _scalar_layers(margin, num_layers + 1, "margin")
     result: dict[str, dict[str, Any]] = {}
     if include_operation_proxies:
         result.update(
@@ -319,7 +322,7 @@ def automatic_semantic_event_scores(
                     "independent": False,
                 },
                 "information_routing": {
-                    "scores": attention.norm(dim=-1),
+                    "scores": route_score(attention),
                     "valid_mask": torch.isfinite(attention).all(dim=-1),
                     "source": "high_raw_attention_output_norm_training_prior_proxy",
                     "positive_only": False,
@@ -340,21 +343,19 @@ def automatic_semantic_event_scores(
             "independent": False,
         }
 
+    refinement_score = prediction_refinement_score(margin, uncertainty)
+    result["prediction_refinement"] = {
+        "scores": refinement_score,
+        "valid_mask": torch.isfinite(refinement_score),
+        "source": "joint_top1_top2_margin_increase_and_uncertainty_decrease",
+        "positive_only": True,
+        "independent": False,
+    }
+
     answer_change = None
     if answer_logprob is not None:
         answer = _scalar_layers(answer_logprob, num_layers + 1, "answer_logprob")
         answer_change = answer[:, 1:] - answer[:, :-1]
-        uncertainty_drop = uncertainty_values[:, :-1] - uncertainty_values[:, 1:]
-        commitment_score = (
-            answer_change.clamp_min(0.0) * uncertainty_drop.clamp_min(0.0)
-        ).sqrt()
-        result["prediction_refinement"] = {
-            "scores": commitment_score,
-            "valid_mask": torch.isfinite(answer_change) & torch.isfinite(uncertainty_drop),
-            "source": "joint_first_token_answer_logprob_increase_and_uncertainty_decrease",
-            "positive_only": True,
-            "independent": False,
-        }
 
     if bridge_change is not None and answer_change is not None:
         transition_score = (

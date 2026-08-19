@@ -174,8 +174,8 @@ status as externally unverified in the manifest.
   `z`/`concept`/`belief`/`uncertainty` block R-squared values plus Macro-R-squared;
 - operation-conditioned multi-step rollout error, coordinate MSE, final-state
   error, and per-horizon errors;
-- per-mode semantic-event AUROC and average precision when the required bridge
-  and answer signals or external event annotations are available.
+- per-mode semantic-event AUROC and average precision when the required margin,
+  uncertainty, bridge, and answer signals or external event annotations are available.
 
 The automatic semantic events implement the proposal's F3/F4/F5 diagnostics.
 They overlap with signals used by the training prior and are therefore marked
@@ -336,6 +336,10 @@ tail -f logs/fuzzy_dynamics_20260816_143025_123456/train_fuzzy_dynamics_*.log
   from the real LLM trajectory. It is not an autonomous Transformer simulation.
 - Bridge and answer event scores currently use only each target's first token.
   Do not describe them as full multi-token entity probabilities.
+- Prediction refinement uses
+  `sqrt(relu(margin[l+1]-margin[l]) * relu(uncertainty[l]-uncertainty[l+1]))`,
+  where margin is the top-1 minus top-2 probability. This is the fixed `phi_A`
+  definition shared by training and automatic evaluation.
 - Norm-based routing/enrichment scores are weak priors. Attention-flow scores,
   trained concept probes, and Patchscopes results should be evaluated as
   stronger alternatives.

@@ -102,9 +102,9 @@ class ActivationExtractorTest(unittest.TestCase):
         self.assertEqual(result["mlp"].shape, (2, 3, 12))
         self.assertEqual(result["belief"].shape, (2, 4, 7))
         self.assertEqual(result["uncertainty"].shape, (2, 4, 1))
+        self.assertEqual(result["margin"].shape, (2, 4, 1))
         self.assertEqual(result["bridge_logprob"].shape, (2, 4, 1))
 
 
 if __name__ == "__main__":
     unittest.main()
-

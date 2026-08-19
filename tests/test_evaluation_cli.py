@@ -47,6 +47,7 @@ class EvaluationCliTest(unittest.TestCase):
                 "mlp": torch.randn(queries, layers, 6, generator=generator),
                 "belief": torch.randn(queries, layers + 1, 3, generator=generator),
                 "uncertainty": torch.rand(queries, layers + 1, 1, generator=generator),
+                "margin": torch.rand(queries, layers + 1, 1, generator=generator),
                 "bridge_logprob": torch.randn(
                     queries, layers + 1, 1, generator=generator
                 ),
