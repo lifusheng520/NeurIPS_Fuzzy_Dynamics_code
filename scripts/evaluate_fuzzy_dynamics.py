@@ -199,6 +199,49 @@ def _state_dimensions(config: FuzzyDynamicsConfig) -> dict[str, int]:
     }
 
 
+def _offset_reconstruction_layers(metrics: dict[str, Any], offset: int) -> None:
+    for entry in metrics["per_layer"]:
+        entry["layer"] += offset
+    bands = {
+        "early_layers_0_8_macro_r2": (0, 9),
+        "middle_layers_9_17_macro_r2": (9, 18),
+        "late_layers_18_29_macro_r2": (18, 30),
+        "final_layers_30_31_macro_r2": (30, 32),
+    }
+    for name, (start, stop) in bands.items():
+        values = [
+            entry["r2"]
+            for entry in metrics["per_layer"]
+            if start <= entry["layer"] < stop
+        ]
+        metrics[name] = (
+            sum(values) / len(values)
+            if values and all(value is not None for value in values)
+            else None
+        )
+
+
+def _operation_metrics(
+    predicted_attention: torch.Tensor,
+    target_attention: torch.Tensor,
+    predicted_mlp: torch.Tensor,
+    target_mlp: torch.Tensor,
+    start_layer: int,
+) -> dict[str, Any]:
+    attention = reconstruction_metrics(predicted_attention, target_attention)
+    mlp = reconstruction_metrics(predicted_mlp, target_mlp)
+    for result in (attention, mlp):
+        _offset_reconstruction_layers(result, start_layer)
+    available = [value["r2"] for value in (attention, mlp) if value["r2"] is not None]
+    return {
+        "kind": "teacher_state_operation_reconstruction",
+        "start_layer": start_layer,
+        "attention": attention,
+        "mlp": mlp,
+        "macro_r2": sum(available) / len(available) if len(available) == 2 else None,
+    }
+
+
 def main() -> None:
     args = parse_args()
     if args.batch_size <= 0:
@@ -276,6 +319,12 @@ def main() -> None:
     all_priors: list[torch.Tensor] = []
     rollout_predicted: list[torch.Tensor] = []
     rollout_target: list[torch.Tensor] = []
+    autonomous_rollout_predicted: list[torch.Tensor] = []
+    autonomous_rollout_target: list[torch.Tensor] = []
+    predicted_attention: list[torch.Tensor] = []
+    target_attention: list[torch.Tensor] = []
+    predicted_mlp: list[torch.Tensor] = []
+    target_mlp: list[torch.Tensor] = []
     raw_attention: list[torch.Tensor] = []
     raw_mlp: list[torch.Tensor] = []
     uncertainty: list[torch.Tensor] = []
@@ -326,6 +375,20 @@ def main() -> None:
                 rollout = model.conditional_rollout(batch)
                 rollout_predicted.append(rollout["predicted_states"].cpu())
                 rollout_target.append(rollout["true_states"].cpu())
+                if model.supports_autonomous_rollout:
+                    autonomous = model.autonomous_rollout(batch)
+                    autonomous_rollout_predicted.append(
+                        autonomous["predicted_states"].cpu()
+                    )
+                    autonomous_rollout_target.append(autonomous["true_states"].cpu())
+            if model.supports_autonomous_rollout:
+                context_layer = config.autonomous_context_layer
+                predicted_attention.append(
+                    outputs["predicted_attention"][:, context_layer:].cpu()
+                )
+                target_attention.append(outputs["attention"][:, context_layer:].cpu())
+                predicted_mlp.append(outputs["predicted_mlp"][:, context_layer:].cpu())
+                target_mlp.append(outputs["mlp"][:, context_layer:].cpu())
             if not args.skip_semantic_alignment and args.semantic_events is None:
                 raw_attention.append(batch["attention"].cpu())
                 raw_mlp.append(batch["mlp"].cpu())
@@ -350,10 +413,41 @@ def main() -> None:
     dimensions = _state_dimensions(config)
     one_step = reconstruction_metrics(predicted_tensor, target_tensor, dimensions)
     fidelity: dict[str, Any] = {"one_step": one_step}
+    if model.supports_autonomous_rollout:
+        context_layer = config.autonomous_context_layer
+        autonomous_one_step = reconstruction_metrics(
+            predicted_tensor[:, context_layer:],
+            target_tensor[:, context_layer:],
+            dimensions,
+        )
+        _offset_reconstruction_layers(autonomous_one_step, context_layer)
+        autonomous_one_step.update(
+            kind="predicted_attention_and_mlp",
+            start_layer=context_layer,
+        )
+        fidelity["autonomous_one_step"] = autonomous_one_step
+        fidelity["operation_reconstruction"] = _operation_metrics(
+            torch.cat(predicted_attention),
+            torch.cat(target_attention),
+            torch.cat(predicted_mlp),
+            torch.cat(target_mlp),
+            context_layer,
+        )
     if not args.skip_rollout:
         fidelity["conditional_rollout"] = rollout_metrics(
             torch.cat(rollout_predicted), torch.cat(rollout_target), dimensions
         )
+        if model.supports_autonomous_rollout:
+            autonomous_metrics = rollout_metrics(
+                torch.cat(autonomous_rollout_predicted),
+                torch.cat(autonomous_rollout_target),
+                dimensions,
+            )
+            autonomous_metrics.update(
+                kind="autonomous_predicted_attention_and_mlp",
+                start_layer=config.autonomous_context_layer,
+            )
+            fidelity["autonomous_rollout"] = autonomous_metrics
 
     event_manifest: dict[str, Any] | None = None
     semantic_alignment: dict[str, Any] | None = None
@@ -403,6 +497,13 @@ def main() -> None:
         "checkpoint_epoch": checkpoint.get("epoch"),
         "cache_model_name": cache.get("model_name"),
         "device": str(device),
+        "operation_source": config.operation_source,
+        "operation_projection": config.operation_projection,
+        "autonomous_context_layer": (
+            config.autonomous_context_layer
+            if model.supports_autonomous_rollout
+            else None
+        ),
         "selection": selection,
         "semantic_events": event_manifest,
     }

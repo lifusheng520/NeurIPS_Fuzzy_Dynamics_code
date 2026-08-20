@@ -62,7 +62,7 @@ class FrozenPCAProjector(nn.Module):
 
 
 class ReasoningProjectors(nn.Module):
-    """Shared frozen P_h/P_c/P_b and trainable operation projectors P_a/P_m."""
+    """Project cached LLM states and operations into compact coordinate systems."""
 
     def __init__(
         self,
@@ -73,21 +73,42 @@ class ReasoningProjectors(nn.Module):
         belief_dim: int,
         operation_dim: int,
         dropout: float = 0.0,
+        operation_projection: str = "learned",
     ) -> None:
         super().__init__()
+        if operation_projection not in {"learned", "frozen_pca"}:
+            raise ValueError("Unsupported operation projection.")
         self.z_dim = z_dim
         self.concept_dim = concept_dim
+        self.operation_projection = operation_projection
         self.hidden_state = FrozenPCAProjector(hidden_size, z_dim + concept_dim)
         self.belief = FrozenPCAProjector(belief_input_dim, belief_dim)
-        self.attention = FeatureProjector(hidden_size, operation_dim, dropout)
-        self.mlp = FeatureProjector(hidden_size, operation_dim, dropout)
+        if operation_projection == "learned":
+            # This is the legacy baseline path. Keep the module structure and
+            # parameter names unchanged so old checkpoints load strictly.
+            self.attention = FeatureProjector(hidden_size, operation_dim, dropout)
+            self.mlp = FeatureProjector(hidden_size, operation_dim, dropout)
+        else:
+            self.attention = FrozenPCAProjector(hidden_size, operation_dim)
+            self.mlp = FrozenPCAProjector(hidden_size, operation_dim)
 
     @torch.no_grad()
     def fit_state_projectors(
-        self, hidden_samples: torch.Tensor, belief_samples: torch.Tensor
+        self,
+        hidden_samples: torch.Tensor,
+        belief_samples: torch.Tensor,
+        attention_samples: torch.Tensor | None = None,
+        mlp_samples: torch.Tensor | None = None,
     ) -> None:
         self.hidden_state.fit(hidden_samples)
         self.belief.fit(belief_samples)
+        if self.operation_projection == "frozen_pca":
+            if attention_samples is None or mlp_samples is None:
+                raise ValueError(
+                    "Frozen operation PCA requires attention and MLP training samples."
+                )
+            self.attention.fit(attention_samples)
+            self.mlp.fit(mlp_samples)
 
     def hidden_and_concept(
         self, values: torch.Tensor

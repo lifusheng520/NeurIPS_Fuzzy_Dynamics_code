@@ -1,0 +1,43 @@
+{
+  "model": {
+    "z_dim": 64,
+    "concept_dim": 32,
+    "belief_dim": 32,
+    "operation_dim": 32,
+    "dynamics_hidden_dim": 128,
+    "projector_dropout": 0.0,
+    "dynamics_dropout": 0.1,
+    "membership_temperature": 1.0,
+    "use_layer_condition": false,
+    "operation_source": "predicted",
+    "operation_projection": "frozen_pca",
+    "operation_predictor_hidden_dim": 256,
+    "autonomous_context_layer": 1
+  },
+  "loss": {
+    "dynamics_weight": 1.0,
+    "semantic_weight": 0.1,
+    "diversity_weight": 0.05,
+    "fuzzy_entropy_weight": 0.01,
+    "balance_weight": 0.01,
+    "concept_probe_weight": 0.05,
+    "semantic_temperature": 1.0,
+    "operation_weight": 1.0,
+    "rollout_weight": 0.5,
+    "rollout_horizon": 31
+  },
+  "training": {
+    "epochs": 100,
+    "batch_size": 16,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "gradient_clip": 1.0,
+    "projector_fit_samples": 8192,
+    "validation_fraction": 0.1,
+    "split_by": "category",
+    "rollout_curriculum": [2, 4, 8, 16, 31],
+    "operation_teacher_probability_start": 1.0,
+    "operation_teacher_probability_end": 0.0,
+    "operation_teacher_decay_epochs": 80
+  }
+}

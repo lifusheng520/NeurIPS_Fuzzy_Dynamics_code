@@ -7,6 +7,7 @@ import argparse
 import json
 import random
 from collections import defaultdict
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -97,6 +98,65 @@ def sample_training_states(
     )
 
 
+def sample_training_operations(
+    cache: dict[str, Any],
+    train_indices: list[int],
+    sample_count: int,
+    seed: int,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Sample aligned raw attention/MLP outputs for fixed operation PCA."""
+    layers = int(cache["attention"].shape[1])
+    total = len(train_indices) * layers
+    count = min(sample_count, total)
+    if count <= 0:
+        raise ValueError("projector_fit_samples must be positive.")
+    generator = torch.Generator().manual_seed(seed + 1)
+    positions = torch.randperm(total, generator=generator)[:count]
+    train_lookup = torch.tensor(train_indices, dtype=torch.long)
+    trajectories = train_lookup[positions // layers]
+    layer_indices = positions % layers
+    return (
+        cache["attention"][trajectories, layer_indices],
+        cache["mlp"][trajectories, layer_indices],
+    )
+
+
+def rollout_horizon_for_epoch(
+    training: dict[str, Any], final_horizon: int, epoch: int
+) -> int:
+    schedule = training.get("rollout_curriculum")
+    if schedule is None:
+        return final_horizon
+    horizons = [int(value) for value in schedule]
+    if (
+        not horizons
+        or any(value < 2 or value > final_horizon for value in horizons)
+        or horizons != sorted(set(horizons))
+        or horizons[-1] != final_horizon
+    ):
+        raise ValueError(
+            "rollout_curriculum must be strictly increasing, contain horizons >=2, "
+            "and end at loss.rollout_horizon."
+        )
+    epochs = int(training["epochs"])
+    index = min(len(horizons) - 1, (epoch - 1) * len(horizons) // epochs)
+    return horizons[index]
+
+
+def operation_teacher_probability(training: dict[str, Any], epoch: int) -> float:
+    start = float(training.get("operation_teacher_probability_start", 0.0))
+    end = float(training.get("operation_teacher_probability_end", 0.0))
+    decay_epochs = int(training.get("operation_teacher_decay_epochs", 1))
+    if not 0.0 <= start <= 1.0 or not 0.0 <= end <= 1.0:
+        raise ValueError("Operation teacher probabilities must lie in [0, 1].")
+    if decay_epochs <= 0:
+        raise ValueError("operation_teacher_decay_epochs must be positive.")
+    if decay_epochs == 1:
+        return end
+    progress = min(1.0, (epoch - 1) / (decay_epochs - 1))
+    return start + progress * (end - start)
+
+
 @torch.no_grad()
 def fit_state_delta_scale(
     model: FuzzyReasoningDynamics, loader: DataLoader, device: torch.device
@@ -107,7 +167,7 @@ def fit_state_delta_scale(
     total_square = torch.zeros_like(total)
     count = 0
     for batch in loader:
-        states, *_ = model._project_batch(move_batch(batch, device))
+        states, *_ = model._project_states(move_batch(batch, device))
         delta = (states[:, 1:] - states[:, :-1]).to(torch.float64)
         total += delta.sum(dim=(0, 1))
         total_square += delta.square().sum(dim=(0, 1))
@@ -255,7 +315,19 @@ def main() -> None:
         "Fitting shared frozen PCA projectors on %d training states across all layers",
         hidden_samples.shape[0],
     )
-    model.fit_state_projectors(hidden_samples, belief_samples)
+    attention_samples = None
+    mlp_samples = None
+    if model_config.operation_projection == "frozen_pca":
+        attention_samples, mlp_samples = sample_training_operations(
+            cache, train_indices, projector_fit_samples, args.seed
+        )
+        logger.info(
+            "Fitting frozen operation PCA projectors on %d aligned transitions",
+            attention_samples.shape[0],
+        )
+    model.fit_state_projectors(
+        hidden_samples, belief_samples, attention_samples, mlp_samples
+    )
     delta_scale = fit_state_delta_scale(model, train_loader, device)
     model.set_state_delta_scale(delta_scale)
     logger.info(
@@ -304,13 +376,35 @@ def main() -> None:
 
     for epoch in range(1, training["epochs"] + 1):
         model.train()
+        train_horizon = rollout_horizon_for_epoch(
+            training, loss_config.rollout_horizon, epoch
+        )
+        train_loss_config = replace(loss_config, rollout_horizon=train_horizon)
+        teacher_probability = (
+            operation_teacher_probability(training, epoch)
+            if model.supports_autonomous_rollout
+            else 0.0
+        )
+        logger.info(
+            "epoch=%03d rollout_horizon=%d operation_teacher_probability=%.4f",
+            epoch,
+            train_horizon,
+            teacher_probability,
+        )
         totals: dict[str, float] = defaultdict(float)
         for batch_number, batch in enumerate(train_loader, start=1):
             optimizer.zero_grad(set_to_none=True)
-            outputs = model(move_batch(batch, device))
-            if loss_config.rollout_weight > 0:
-                model.add_short_rollout(outputs, loss_config.rollout_horizon)
-            loss, metrics = fuzzy_dynamics_loss(outputs, loss_config)
+            outputs = model(
+                move_batch(batch, device),
+                operation_teacher_probability=teacher_probability,
+            )
+            if train_loss_config.rollout_weight > 0:
+                model.add_short_rollout(
+                    outputs,
+                    train_horizon,
+                    operation_teacher_probability=teacher_probability,
+                )
+            loss, metrics = fuzzy_dynamics_loss(outputs, train_loss_config)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), training.get("gradient_clip", 1.0))
             optimizer.step()

@@ -38,6 +38,10 @@ class EvaluationCliTest(unittest.TestCase):
                 operation_dim=3,
                 dynamics_hidden_dim=5,
                 dynamics_dropout=0.0,
+                operation_source="predicted",
+                operation_projection="frozen_pca",
+                operation_predictor_hidden_dim=7,
+                autonomous_context_layer=1,
             )
             generator = torch.Generator().manual_seed(7)
             queries, layers = 4, 3
@@ -66,6 +70,8 @@ class EvaluationCliTest(unittest.TestCase):
             model.fit_state_projectors(
                 cache["hidden"][:2].reshape(-1, config.hidden_size),
                 cache["belief"][:2].reshape(-1, config.belief_input_dim),
+                cache["attention"][:2].reshape(-1, config.hidden_size),
+                cache["mlp"][:2].reshape(-1, config.hidden_size),
             )
             split_path = training_dir / "split.json"
             checkpoint = model.checkpoint(
@@ -112,6 +118,12 @@ class EvaluationCliTest(unittest.TestCase):
             self.assertIn("one_step", metrics["fidelity"])
             self.assertIn("components", metrics["fidelity"]["one_step"])
             self.assertIn("conditional_rollout", metrics["fidelity"])
+            self.assertIn("autonomous_rollout", metrics["fidelity"])
+            self.assertIn("autonomous_one_step", metrics["fidelity"])
+            self.assertIn("operation_reconstruction", metrics["fidelity"])
+            self.assertEqual(
+                metrics["fidelity"]["autonomous_rollout"]["start_layer"], 1
+            )
             self.assertIn("modes", metrics["semantic_alignment"])
             with (output_dir / "trajectories.jsonl").open(encoding="utf-8") as handle:
                 trajectories = [json.loads(line) for line in handle]

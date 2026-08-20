@@ -104,6 +104,38 @@ def fuzzy_dynamics_loss(
             horizon_losses.append(value)
         rollout = torch.stack(horizon_losses).mean()
 
+    operation_attention = torch.zeros((), device=predicted_delta.device)
+    operation_mlp = torch.zeros((), device=predicted_delta.device)
+    if config.operation_weight > 0:
+        predicted_attention = outputs.get("predicted_attention")
+        predicted_mlp = outputs.get("predicted_mlp")
+        observed_attention = outputs.get("attention")
+        observed_mlp = outputs.get("mlp")
+        operation_mask = outputs.get("operation_mask")
+        if any(
+            value is None
+            for value in (
+                predicted_attention,
+                predicted_mlp,
+                observed_attention,
+                observed_mlp,
+                operation_mask,
+            )
+        ):
+            raise ValueError(
+                "Positive operation_weight requires predicted and observed operations."
+            )
+        mask = operation_mask.expand_as(predicted_attention)
+        if not mask.any():
+            raise ValueError("Operation reconstruction mask cannot be empty.")
+        operation_attention = (
+            predicted_attention - observed_attention.detach()
+        ).square()[mask].mean()
+        operation_mlp = (
+            predicted_mlp - observed_mlp.detach()
+        ).square()[mask].mean()
+    operation = 0.5 * (operation_attention + operation_mlp)
+
     prior = semantic_reasoning_prior(outputs, config.semantic_temperature)
     semantic = (prior * (prior.clamp_min(1e-8).log() - memberships.log())).sum(-1).mean()
     diversity = diversity_loss(outputs["local_deltas"])
@@ -126,6 +158,7 @@ def fuzzy_dynamics_loss(
     total = (
         config.dynamics_weight * dynamics
         + config.rollout_weight * rollout
+        + config.operation_weight * operation
         + config.semantic_weight * semantic
         + config.diversity_weight * diversity
         + config.fuzzy_entropy_weight * fuzzy_entropy
@@ -138,6 +171,9 @@ def fuzzy_dynamics_loss(
         **{f"dynamics_{name}": value.detach() for name, value in block_losses.items()},
         "rollout": rollout.detach(),
         **{name: value.detach() for name, value in rollout_horizons.items()},
+        "operation": operation.detach(),
+        "operation_attention": operation_attention.detach(),
+        "operation_mlp": operation_mlp.detach(),
         "semantic": semantic.detach(),
         "diversity": diversity.detach(),
         "fuzzy_entropy": (-fuzzy_entropy).detach(),

@@ -10,6 +10,7 @@ from torch import nn
 from .config import FuzzyDynamicsConfig
 from .local_dynamics import LocalReasoningDynamics
 from .membership import MembershipDynamics
+from .operation_predictor import OperationPredictor
 from .projectors import ReasoningProjectors
 
 
@@ -25,6 +26,7 @@ class FuzzyReasoningDynamics(nn.Module):
             belief_dim=config.belief_dim,
             operation_dim=config.operation_dim,
             dropout=config.projector_dropout,
+            operation_projection=config.operation_projection,
         )
         self.local_dynamics = LocalReasoningDynamics(
             z_dim=config.z_dim,
@@ -43,14 +45,34 @@ class FuzzyReasoningDynamics(nn.Module):
             temperature=config.membership_temperature,
         )
         self.bridge_concept_probe = nn.Linear(config.concept_dim, 1)
+        self.operation_predictor = (
+            OperationPredictor(
+                state_dim=config.state_dim,
+                operation_dim=config.operation_dim,
+                hidden_dim=config.operation_predictor_hidden_dim,
+                dropout=config.dynamics_dropout,
+            )
+            if config.operation_source == "predicted"
+            else None
+        )
         self.register_buffer("state_delta_scale", torch.ones(config.state_dim))
         self.register_buffer("state_delta_scale_fitted", torch.tensor(False))
 
+    @property
+    def supports_autonomous_rollout(self) -> bool:
+        return self.operation_predictor is not None
+
     @torch.no_grad()
     def fit_state_projectors(
-        self, hidden_samples: torch.Tensor, belief_samples: torch.Tensor
+        self,
+        hidden_samples: torch.Tensor,
+        belief_samples: torch.Tensor,
+        attention_samples: torch.Tensor | None = None,
+        mlp_samples: torch.Tensor | None = None,
     ) -> None:
-        self.projectors.fit_state_projectors(hidden_samples, belief_samples)
+        self.projectors.fit_state_projectors(
+            hidden_samples, belief_samples, attention_samples, mlp_samples
+        )
 
     @torch.no_grad()
     def set_state_delta_scale(self, scale: torch.Tensor) -> None:
@@ -58,6 +80,27 @@ class FuzzyReasoningDynamics(nn.Module):
             raise ValueError(f"Expected state delta scale [{self.config.state_dim}].")
         self.state_delta_scale.copy_(scale.to(self.state_delta_scale).clamp_min(1e-4))
         self.state_delta_scale_fitted.fill_(True)
+
+    def _project_states(
+        self, batch: dict[str, torch.Tensor]
+    ) -> tuple[
+        torch.Tensor,
+        torch.Tensor,
+        torch.Tensor,
+        torch.Tensor,
+        torch.Tensor,
+    ]:
+        """Project cached LLM states without reading observed layer operations."""
+        hidden = batch["hidden"]
+        belief_raw = batch["belief"]
+        uncertainty_raw = batch["uncertainty"]
+
+        z, concept = self.projectors.hidden_and_concept(hidden)
+        belief = self.projectors.belief(belief_raw)
+        max_entropy = max(1.0, float(torch.log(torch.tensor(self.config.vocab_size))))
+        uncertainty = uncertainty_raw / max_entropy
+        states = torch.cat((z, concept, belief, uncertainty), dim=-1)
+        return states, z, concept, belief, uncertainty
 
     def _project_batch(
         self, batch: dict[str, torch.Tensor]
@@ -70,20 +113,10 @@ class FuzzyReasoningDynamics(nn.Module):
         torch.Tensor,
         torch.Tensor,
     ]:
-        """Project cached LLM signals into the learned reasoning spaces."""
-        hidden = batch["hidden"]
-        attention_raw = batch["attention"]
-        mlp_raw = batch["mlp"]
-        belief_raw = batch["belief"]
-        uncertainty_raw = batch["uncertainty"]
-
-        z, concept = self.projectors.hidden_and_concept(hidden)
-        belief = self.projectors.belief(belief_raw)
-        attention = self.projectors.attention(attention_raw)
-        mlp = self.projectors.mlp(mlp_raw)
-        max_entropy = max(1.0, float(torch.log(torch.tensor(self.config.vocab_size))))
-        uncertainty = uncertainty_raw / max_entropy
-        states = torch.cat((z, concept, belief, uncertainty), dim=-1)
+        """Project cached LLM states and observed operations."""
+        states, z, concept, belief, uncertainty = self._project_states(batch)
+        attention = self.projectors.attention(batch["attention"])
+        mlp = self.projectors.mlp(batch["mlp"])
         return states, z, concept, belief, uncertainty, attention, mlp
 
     @staticmethod
@@ -96,7 +129,46 @@ class FuzzyReasoningDynamics(nn.Module):
         values = torch.arange(num_layers, device=device, dtype=dtype) / denominator
         return values.view(1, num_layers, 1).expand(batch_size, -1, -1)
 
-    def forward(self, batch: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+    def _validate_context_layer(self, num_layers: int) -> int:
+        context_layer = self.config.autonomous_context_layer
+        if context_layer >= num_layers:
+            raise ValueError(
+                f"autonomous_context_layer={context_layer} must be smaller than "
+                f"the number of transitions ({num_layers})."
+            )
+        return context_layer
+
+    def _predict_operations(
+        self,
+        states: torch.Tensor,
+        layer_positions: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        if self.operation_predictor is None:
+            raise RuntimeError("This configuration has no autonomous operation predictor.")
+        num_layers = layer_positions.shape[1]
+        context_layer = self._validate_context_layer(num_layers)
+        current_states = states[:, :-1]
+        context = states[:, context_layer : context_layer + 1].expand_as(current_states)
+        return self.operation_predictor(current_states, context, layer_positions)
+
+    @staticmethod
+    def _mix_operations(
+        predicted: torch.Tensor,
+        observed: torch.Tensor,
+        teacher_probability: float,
+    ) -> torch.Tensor:
+        if not 0.0 <= teacher_probability <= 1.0:
+            raise ValueError("operation_teacher_probability must lie in [0, 1].")
+        return (
+            teacher_probability * observed
+            + (1.0 - teacher_probability) * predicted
+        )
+
+    def forward(
+        self,
+        batch: dict[str, torch.Tensor],
+        operation_teacher_probability: float = 0.0,
+    ) -> dict[str, torch.Tensor]:
         states, z, concept, belief, uncertainty, attention, mlp = self._project_batch(batch)
 
         current_z = z[:, :-1]
@@ -109,17 +181,49 @@ class FuzzyReasoningDynamics(nn.Module):
             attention.shape[1], attention.shape[0], attention.device, attention.dtype
         )
 
+        dynamics_attention = attention
+        dynamics_mlp = mlp
+        dynamics_concept_change = concept_change
+        predicted_attention: torch.Tensor | None = None
+        predicted_mlp: torch.Tensor | None = None
+        operation_mask: torch.Tensor | None = None
+        if self.operation_predictor is not None:
+            predicted_attention, predicted_mlp = self._predict_operations(
+                states, layer_position
+            )
+            mixed_attention = self._mix_operations(
+                predicted_attention, attention, operation_teacher_probability
+            )
+            mixed_mlp = self._mix_operations(
+                predicted_mlp, mlp, operation_teacher_probability
+            )
+            context_layer = self._validate_context_layer(attention.shape[1])
+            operation_mask = (
+                torch.arange(attention.shape[1], device=attention.device)
+                .ge(context_layer)
+                .view(1, -1, 1)
+            )
+            # The autonomous simulation is initialized at the contextualized
+            # state s_context. Earlier transitions remain the observed baseline
+            # and are excluded from operation reconstruction metrics/losses.
+            dynamics_attention = torch.where(operation_mask, mixed_attention, attention)
+            dynamics_mlp = torch.where(operation_mask, mixed_mlp, mlp)
+            dynamics_concept_change = concept_change.clone()
+            dynamics_concept_change[:, context_layer] = 0.0
+
         local_deltas = self.local_dynamics(
             current_z,
             current_concept,
             current_belief,
             current_uncertainty,
-            attention,
-            mlp,
-            concept_change,
+            dynamics_attention,
+            dynamics_mlp,
+            dynamics_concept_change,
             layer_position,
         )
-        memberships = self.membership_dynamics(states[:, :-1], attention, mlp)
+        memberships = self.membership_dynamics(
+            states[:, :-1], dynamics_attention, dynamics_mlp
+        )
         predicted_delta = (memberships.unsqueeze(-1) * local_deltas).sum(dim=-2)
         target_delta = states[:, 1:] - states[:, :-1]
 
@@ -131,7 +235,10 @@ class FuzzyReasoningDynamics(nn.Module):
             "uncertainty": uncertainty,
             "attention": attention,
             "mlp": mlp,
+            "dynamics_attention": dynamics_attention,
+            "dynamics_mlp": dynamics_mlp,
             "concept_change": concept_change,
+            "dynamics_concept_change": dynamics_concept_change,
             "layer_position": layer_position,
             "bridge_probe_logits": self.bridge_concept_probe(concept),
             "local_deltas": local_deltas,
@@ -146,6 +253,13 @@ class FuzzyReasoningDynamics(nn.Module):
                 "uncertainty": 1,
             },
         }
+        if predicted_attention is not None and predicted_mlp is not None:
+            outputs.update(
+                predicted_attention=predicted_attention,
+                predicted_mlp=predicted_mlp,
+                operation_mask=operation_mask,
+                operation_teacher_probability=operation_teacher_probability,
+            )
         for name in ("bridge_logprob", "answer_logprob", "margin"):
             if name in batch:
                 outputs[name] = batch[name]
@@ -225,10 +339,104 @@ class FuzzyReasoningDynamics(nn.Module):
             "rollout_kind": "conditional_on_observed_attention_and_mlp",
         }
 
+    def autonomous_rollout(self, batch: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+        """Roll forward using only operations predicted on the simulated trajectory.
+
+        The rollout is initialized at ``s_context`` rather than the embedding
+        state ``s_0``. The first contextualized last-token state contains prompt
+        information that is unavailable in the isolated final-token embedding.
+        No observed attention or MLP feature is read after initialization.
+        """
+        if self.operation_predictor is None:
+            raise RuntimeError(
+                "autonomous_rollout requires operation_source='predicted'."
+            )
+        true_states, _, _, _, _ = self._project_states(batch)
+        num_layers = true_states.shape[1] - 1
+        context_layer = self._validate_context_layer(num_layers)
+        positions = self._layer_positions(
+            num_layers, true_states.shape[0], true_states.device, true_states.dtype
+        )
+
+        context = true_states[:, context_layer]
+        current = context
+        predicted_states = [current]
+        predicted_deltas = []
+        predicted_attention = []
+        predicted_mlp = []
+        rollout_memberships = []
+        rollout_local_deltas = []
+        previous_membership = self.membership_dynamics.initial_membership(current.shape[0])
+        previous_concept: torch.Tensor | None = None
+        component_sizes = (
+            self.config.z_dim,
+            self.config.concept_dim,
+            self.config.belief_dim,
+            1,
+        )
+
+        for layer_index in range(context_layer, num_layers):
+            z, concept, belief, uncertainty = current.split(component_sizes, dim=-1)
+            concept_change = (
+                torch.zeros_like(concept)
+                if previous_concept is None
+                else concept - previous_concept
+            )
+            layer_position = positions[:, layer_index]
+            layer_attention, layer_mlp = self.operation_predictor(
+                current, context, layer_position
+            )
+            local_deltas = self.local_dynamics(
+                z.unsqueeze(1),
+                concept.unsqueeze(1),
+                belief.unsqueeze(1),
+                uncertainty.unsqueeze(1),
+                layer_attention.unsqueeze(1),
+                layer_mlp.unsqueeze(1),
+                concept_change.unsqueeze(1),
+                layer_position.unsqueeze(1),
+            ).squeeze(1)
+            membership = self.membership_dynamics.step(
+                current,
+                layer_attention,
+                layer_mlp,
+                previous_membership,
+            )
+            delta = (membership.unsqueeze(-1) * local_deltas).sum(dim=-2)
+
+            previous_concept = concept
+            previous_membership = membership
+            current = current + delta
+            predicted_states.append(current)
+            predicted_deltas.append(delta)
+            predicted_attention.append(layer_attention)
+            predicted_mlp.append(layer_mlp)
+            rollout_memberships.append(membership)
+            rollout_local_deltas.append(local_deltas)
+
+        return {
+            "true_states": true_states[:, context_layer:],
+            "predicted_states": torch.stack(predicted_states, dim=1),
+            "predicted_delta": torch.stack(predicted_deltas, dim=1),
+            "predicted_attention": torch.stack(predicted_attention, dim=1),
+            "predicted_mlp": torch.stack(predicted_mlp, dim=1),
+            "memberships": torch.stack(rollout_memberships, dim=1),
+            "local_deltas": torch.stack(rollout_local_deltas, dim=1),
+            "start_layer": context_layer,
+            "rollout_kind": "autonomous_predicted_attention_and_mlp",
+        }
+
     def add_short_rollout(
-        self, outputs: dict[str, Any], horizon: int
+        self,
+        outputs: dict[str, Any],
+        horizon: int,
+        operation_teacher_probability: float = 0.0,
     ) -> dict[str, Any]:
         """Attach a differentiable random-window conditional rollout for training."""
+        if self.operation_predictor is not None:
+            return self._add_autonomous_short_rollout(
+                outputs, horizon, operation_teacher_probability
+            )
         if horizon < 2:
             raise ValueError("rollout_horizon must be at least 2.")
         states = outputs["states"]
@@ -298,6 +506,110 @@ class FuzzyReasoningDynamics(nn.Module):
         outputs["short_rollout_predicted_states"] = torch.stack(predicted_states, dim=1)
         outputs["short_rollout_target_states"] = torch.stack(target_states, dim=1)
         outputs["short_rollout_starts"] = starts
+        outputs["short_rollout_kind"] = "conditional_on_observed_attention_and_mlp"
+        return outputs
+
+    def _add_autonomous_short_rollout(
+        self,
+        outputs: dict[str, Any],
+        horizon: int,
+        operation_teacher_probability: float,
+    ) -> dict[str, Any]:
+        """Attach a differentiable rollout whose operations follow predicted states."""
+        if self.operation_predictor is None:
+            raise RuntimeError("Autonomous short rollout requires an operation predictor.")
+        if horizon < 2:
+            raise ValueError("rollout_horizon must be at least 2.")
+        states = outputs["states"]
+        attention = outputs["attention"]
+        mlp = outputs["mlp"]
+        batch_size, num_layers = attention.shape[:2]
+        context_layer = self._validate_context_layer(num_layers)
+        if context_layer + horizon > num_layers:
+            raise ValueError(
+                f"rollout_horizon={horizon} from context layer {context_layer} "
+                f"exceeds {num_layers} transitions."
+            )
+        num_starts = num_layers - horizon - context_layer + 1
+        if self.training:
+            starts = context_layer + torch.randint(
+                num_starts, (batch_size,), device=states.device
+            )
+        else:
+            starts = context_layer + (
+                torch.arange(batch_size, device=states.device) % num_starts
+            )
+        rows = torch.arange(batch_size, device=states.device)
+        context = states[:, context_layer]
+        current = states[rows, starts]
+        predicted_states = [current]
+        target_states = [current]
+        predicted_attention = []
+        predicted_mlp = []
+        previous_membership = self.membership_dynamics.initial_membership(batch_size)
+        previous_concept: torch.Tensor | None = None
+        component_sizes = (
+            self.config.z_dim,
+            self.config.concept_dim,
+            self.config.belief_dim,
+            1,
+        )
+        all_positions = self._layer_positions(
+            num_layers, batch_size, states.device, states.dtype
+        )
+
+        for step in range(horizon):
+            layer_indices = starts + step
+            z, concept, belief, uncertainty = current.split(component_sizes, dim=-1)
+            concept_change = (
+                torch.zeros_like(concept)
+                if previous_concept is None
+                else concept - previous_concept
+            )
+            layer_position = all_positions[rows, layer_indices]
+            layer_predicted_attention, layer_predicted_mlp = self.operation_predictor(
+                current, context, layer_position
+            )
+            layer_attention = self._mix_operations(
+                layer_predicted_attention,
+                attention[rows, layer_indices],
+                operation_teacher_probability,
+            )
+            layer_mlp = self._mix_operations(
+                layer_predicted_mlp,
+                mlp[rows, layer_indices],
+                operation_teacher_probability,
+            )
+            local_deltas = self.local_dynamics(
+                z.unsqueeze(1),
+                concept.unsqueeze(1),
+                belief.unsqueeze(1),
+                uncertainty.unsqueeze(1),
+                layer_attention.unsqueeze(1),
+                layer_mlp.unsqueeze(1),
+                concept_change.unsqueeze(1),
+                layer_position.unsqueeze(1),
+            ).squeeze(1)
+            membership = self.membership_dynamics.step(
+                current, layer_attention, layer_mlp, previous_membership
+            )
+            delta = (membership.unsqueeze(-1) * local_deltas).sum(dim=-2)
+            previous_concept = concept
+            previous_membership = membership
+            current = current + delta
+            predicted_states.append(current)
+            target_states.append(states[rows, layer_indices + 1])
+            predicted_attention.append(layer_predicted_attention)
+            predicted_mlp.append(layer_predicted_mlp)
+
+        outputs["short_rollout_predicted_states"] = torch.stack(predicted_states, dim=1)
+        outputs["short_rollout_target_states"] = torch.stack(target_states, dim=1)
+        outputs["short_rollout_predicted_attention"] = torch.stack(
+            predicted_attention, dim=1
+        )
+        outputs["short_rollout_predicted_mlp"] = torch.stack(predicted_mlp, dim=1)
+        outputs["short_rollout_starts"] = starts
+        outputs["short_rollout_kind"] = "autonomous_predicted_attention_and_mlp"
         return outputs
 
     def checkpoint(self, **metadata: Any) -> dict[str, Any]:

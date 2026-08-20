@@ -28,6 +28,29 @@ class IdenticalZDynamics(nn.Module):
 
 
 class FuzzyDynamicsTest(unittest.TestCase):
+    def test_legacy_observed_configuration_keeps_checkpoint_structure(self) -> None:
+        legacy = FuzzyDynamicsConfig.from_dict(
+            {
+                "hidden_size": 4,
+                "belief_input_dim": 2,
+                "vocab_size": 11,
+                "z_dim": 2,
+                "concept_dim": 1,
+                "belief_dim": 1,
+                "operation_dim": 2,
+                "dynamics_hidden_dim": 4,
+            }
+        )
+        original = FuzzyReasoningDynamics(legacy)
+        restored = FuzzyReasoningDynamics(FuzzyDynamicsConfig.from_dict(legacy.to_dict()))
+        restored.load_state_dict(original.state_dict(), strict=True)
+        self.assertEqual(legacy.operation_source, "observed")
+        self.assertEqual(legacy.operation_projection, "learned")
+        self.assertIsNone(restored.operation_predictor)
+        self.assertFalse(
+            any(name.startswith("operation_predictor") for name in restored.state_dict())
+        )
+
     def test_conditional_rollout_uses_predicted_not_true_intermediate_state(self) -> None:
         config = FuzzyDynamicsConfig(
             hidden_size=2,
@@ -183,6 +206,123 @@ class FuzzyDynamicsTest(unittest.TestCase):
         loss.backward()
         self.assertIsNotNone(
             model.local_dynamics.knowledge_enrichment.network[-1].weight.grad
+        )
+
+    def test_autonomous_rollout_does_not_read_observed_future_operations(self) -> None:
+        batch_size, layers, hidden_size, belief_size = 3, 5, 8, 4
+        config = FuzzyDynamicsConfig(
+            hidden_size=hidden_size,
+            belief_input_dim=belief_size,
+            vocab_size=19,
+            z_dim=3,
+            concept_dim=2,
+            belief_dim=2,
+            operation_dim=3,
+            dynamics_hidden_dim=7,
+            dynamics_dropout=0.0,
+            operation_source="predicted",
+            operation_projection="frozen_pca",
+            operation_predictor_hidden_dim=9,
+            autonomous_context_layer=1,
+        )
+        generator = torch.Generator().manual_seed(23)
+        batch = {
+            "hidden": torch.randn(
+                batch_size, layers + 1, hidden_size, generator=generator
+            ),
+            "attention": torch.randn(
+                batch_size, layers, hidden_size, generator=generator
+            ),
+            "mlp": torch.randn(batch_size, layers, hidden_size, generator=generator),
+            "belief": torch.randn(
+                batch_size, layers + 1, belief_size, generator=generator
+            ),
+            "uncertainty": torch.rand(
+                batch_size, layers + 1, 1, generator=generator
+            ),
+            "margin": torch.rand(batch_size, layers + 1, 1, generator=generator),
+        }
+        model = FuzzyReasoningDynamics(config)
+        model.fit_state_projectors(
+            batch["hidden"].reshape(-1, hidden_size),
+            batch["belief"].reshape(-1, belief_size),
+            batch["attention"].reshape(-1, hidden_size),
+            batch["mlp"].reshape(-1, hidden_size),
+        )
+        model.eval()
+        with torch.no_grad():
+            original = model.autonomous_rollout(batch)
+            state_only_batch = {
+                name: value
+                for name, value in batch.items()
+                if name not in {"attention", "mlp"}
+            }
+            altered = model.autonomous_rollout(state_only_batch)
+        self.assertEqual(
+            original["predicted_states"].shape,
+            (batch_size, layers, config.state_dim),
+        )
+        self.assertTrue(
+            torch.allclose(original["predicted_states"], altered["predicted_states"])
+        )
+        self.assertEqual(original["start_layer"], 1)
+        self.assertEqual(
+            original["rollout_kind"], "autonomous_predicted_attention_and_mlp"
+        )
+
+    def test_autonomous_operation_and_rollout_losses_are_differentiable(self) -> None:
+        batch_size, layers, hidden_size, belief_size = 3, 5, 8, 4
+        config = FuzzyDynamicsConfig(
+            hidden_size=hidden_size,
+            belief_input_dim=belief_size,
+            vocab_size=19,
+            z_dim=3,
+            concept_dim=2,
+            belief_dim=2,
+            operation_dim=3,
+            dynamics_hidden_dim=7,
+            dynamics_dropout=0.0,
+            operation_source="predicted",
+            operation_projection="frozen_pca",
+            operation_predictor_hidden_dim=9,
+            autonomous_context_layer=1,
+        )
+        batch = {
+            "hidden": torch.randn(batch_size, layers + 1, hidden_size),
+            "attention": torch.randn(batch_size, layers, hidden_size),
+            "mlp": torch.randn(batch_size, layers, hidden_size),
+            "belief": torch.randn(batch_size, layers + 1, belief_size),
+            "uncertainty": torch.rand(batch_size, layers + 1, 1),
+            "margin": torch.rand(batch_size, layers + 1, 1),
+        }
+        model = FuzzyReasoningDynamics(config)
+        model.fit_state_projectors(
+            batch["hidden"].reshape(-1, hidden_size),
+            batch["belief"].reshape(-1, belief_size),
+            batch["attention"].reshape(-1, hidden_size),
+            batch["mlp"].reshape(-1, hidden_size),
+        )
+        outputs = model(batch, operation_teacher_probability=0.25)
+        model.add_short_rollout(
+            outputs, horizon=3, operation_teacher_probability=0.25
+        )
+        loss, metrics = fuzzy_dynamics_loss(
+            outputs,
+            LossConfig(
+                rollout_weight=0.5,
+                rollout_horizon=3,
+                operation_weight=1.0,
+            ),
+        )
+        self.assertTrue(torch.isfinite(loss))
+        self.assertGreater(float(metrics["operation"]), 0.0)
+        self.assertEqual(
+            outputs["short_rollout_kind"],
+            "autonomous_predicted_attention_and_mlp",
+        )
+        loss.backward()
+        self.assertIsNotNone(
+            model.operation_predictor.attention.network[-1].weight.grad
         )
 
 

@@ -15,6 +15,121 @@ from scripts.train_fuzzy_dynamics import main
 
 
 class TrainingCliTest(unittest.TestCase):
+    def test_trains_autonomous_configuration_with_fixed_operation_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            cache_path = root / "activations.pt"
+            config_path = root / "autonomous.json"
+            generator = torch.Generator().manual_seed(31)
+            queries, layers, hidden_size = 6, 3, 5
+            torch.save(
+                {
+                    "hidden": torch.randn(
+                        queries, layers + 1, hidden_size, generator=generator
+                    ),
+                    "attention": torch.randn(
+                        queries, layers, hidden_size, generator=generator
+                    ),
+                    "mlp": torch.randn(
+                        queries, layers, hidden_size, generator=generator
+                    ),
+                    "belief": torch.randn(
+                        queries, layers + 1, 2, generator=generator
+                    ),
+                    "uncertainty": torch.rand(
+                        queries, layers + 1, 1, generator=generator
+                    ),
+                    "margin": torch.rand(
+                        queries, layers + 1, 1, generator=generator
+                    ),
+                    "metadata": [
+                        {"uid": f"q{index}", "category": f"c{index // 2}"}
+                        for index in range(queries)
+                    ],
+                    "vocab_size": 13,
+                },
+                cache_path,
+            )
+            config_path.write_text(
+                json.dumps(
+                    {
+                        "model": {
+                            "z_dim": 2,
+                            "concept_dim": 1,
+                            "belief_dim": 1,
+                            "operation_dim": 2,
+                            "dynamics_hidden_dim": 4,
+                            "dynamics_dropout": 0.0,
+                            "operation_source": "predicted",
+                            "operation_projection": "frozen_pca",
+                            "operation_predictor_hidden_dim": 5,
+                            "autonomous_context_layer": 1,
+                        },
+                        "loss": {
+                            "operation_weight": 1.0,
+                            "rollout_weight": 0.5,
+                            "rollout_horizon": 2,
+                        },
+                        "training": {
+                            "epochs": 1,
+                            "batch_size": 2,
+                            "learning_rate": 0.001,
+                            "projector_fit_samples": 16,
+                            "validation_fraction": 0.34,
+                            "split_by": "category",
+                            "rollout_curriculum": [2],
+                            "operation_teacher_probability_start": 0.0,
+                            "operation_teacher_probability_end": 0.0,
+                            "operation_teacher_decay_epochs": 1,
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            experiment_time = "20260816_120002_000003"
+            argv = [
+                "train_fuzzy_dynamics",
+                "--activations",
+                str(cache_path),
+                "--config",
+                str(config_path),
+                "--seed",
+                "42",
+                "--results-root",
+                str(root / "results"),
+                "--log-dir",
+                str(root / "logs"),
+                "--device",
+                "cpu",
+                "--log-every-batches",
+                "1",
+            ]
+            with (
+                patch(
+                    "scripts.train_fuzzy_dynamics.generate_experiment_time",
+                    return_value=experiment_time,
+                ),
+                patch.object(sys, "argv", argv),
+                redirect_stdout(io.StringIO()),
+                redirect_stderr(io.StringIO()),
+            ):
+                main()
+
+            experiment_dir = root / "results" / f"fuzzy_dynamics_{experiment_time}"
+            checkpoint = torch.load(
+                experiment_dir / "checkpoint" / "best.pt",
+                map_location="cpu",
+                weights_only=False,
+            )
+            self.assertEqual(checkpoint["model_config"]["operation_source"], "predicted")
+            history = json.loads(
+                (experiment_dir / "training" / "history.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertGreater(history[0]["train"]["operation"], 0.0)
+            self.assertIn("rollout_h2", history[0]["validation"])
+
     def test_experiment_times_isolate_independent_training_runs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

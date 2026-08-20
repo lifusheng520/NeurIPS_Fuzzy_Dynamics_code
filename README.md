@@ -149,6 +149,20 @@ one another. The seed/config/cache mapping is stored in `experiment_manifest.jso
 
 Ready-to-run loss ablations are provided under `configs/ablation_*.json`.
 
+For a closed surrogate trajectory that predicts its own attention/MLP
+operations, use `configs/fuzzy_dynamics_autonomous.json`. It keeps the existing
+operation-conditioned baselines unchanged, fits fixed operation PCA targets,
+and trains predicted operations with teacher-probability and rollout-horizon
+curricula. The autonomous trajectory starts at contextualized state `s_1` and
+predicts the remaining 31 Llama-3 transitions:
+
+```bash
+python -m scripts.train_fuzzy_dynamics \
+  --activations cache/socrates_llama3_8b_tuned_full.pt \
+  --config configs/fuzzy_dynamics_autonomous.json \
+  --seed 42
+```
+
 ## 3. Export reasoning trajectories
 
 Evaluation artifacts go to the selected run's `evaluation/` directory.
@@ -174,6 +188,9 @@ status as externally unverified in the manifest.
   `z`/`concept`/`belief`/`uncertainty` block R-squared values plus Macro-R-squared;
 - operation-conditioned multi-step rollout error, coordinate MSE, final-state
   error, and per-horizon errors;
+- for predicted-operation checkpoints, teacher-state attention/MLP
+  reconstruction, autonomous one-step fidelity, and a separate
+  `autonomous_rollout` that never consumes observed future operations;
 - per-mode semantic-event AUROC and average precision when the required margin,
   uncertainty, bridge, and answer signals or external event annotations are available.
 
