@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=fuzzy-array
 #SBATCH --array=0-11
-#SBATCH --partition=hopper140
+#SBATCH --partition=hopper96
 #SBATCH --gres=gpu:nvidia:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=30G

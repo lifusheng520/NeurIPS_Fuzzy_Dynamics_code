@@ -1,0 +1,336 @@
+{
+  "mode_usage": {
+    "knowledge_enrichment": 0.19134578108787537,
+    "information_routing": 0.18860915303230286,
+    "concept_composition": 0.22132383286952972,
+    "prediction_refinement": 0.22444912791252136,
+    "hop_transition": 0.1742720901966095
+  },
+  "weighted_mode_contribution": {
+    "knowledge_enrichment": 2.8125948905944824,
+    "information_routing": 2.0319108963012695,
+    "concept_composition": 2.8310060501098633,
+    "prediction_refinement": 1.6330761909484863,
+    "hop_transition": 1.4900630712509155
+  },
+  "mean_membership_by_layer": [
+    {
+      "knowledge_enrichment": 0.11596214026212692,
+      "information_routing": 0.191836878657341,
+      "concept_composition": 0.20014551281929016,
+      "prediction_refinement": 0.3534031808376312,
+      "hop_transition": 0.1386522799730301
+    },
+    {
+      "knowledge_enrichment": 0.20612525939941406,
+      "information_routing": 0.16151708364486694,
+      "concept_composition": 0.20242178440093994,
+      "prediction_refinement": 0.31082606315612793,
+      "hop_transition": 0.11910975724458694
+    },
+    {
+      "knowledge_enrichment": 0.16207371652126312,
+      "information_routing": 0.1836393028497696,
+      "concept_composition": 0.23169496655464172,
+      "prediction_refinement": 0.3038331866264343,
+      "hop_transition": 0.11875880509614944
+    },
+    {
+      "knowledge_enrichment": 0.23445968329906464,
+      "information_routing": 0.1951499581336975,
+      "concept_composition": 0.2207714170217514,
+      "prediction_refinement": 0.2550329864025116,
+      "hop_transition": 0.09458594024181366
+    },
+    {
+      "knowledge_enrichment": 0.1996321678161621,
+      "information_routing": 0.1800064742565155,
+      "concept_composition": 0.2451602816581726,
+      "prediction_refinement": 0.2577037215232849,
+      "hop_transition": 0.11749731749296188
+    },
+    {
+      "knowledge_enrichment": 0.2530103921890259,
+      "information_routing": 0.14864392578601837,
+      "concept_composition": 0.20093096792697906,
+      "prediction_refinement": 0.2502806484699249,
+      "hop_transition": 0.14713405072689056
+    },
+    {
+      "knowledge_enrichment": 0.22308720648288727,
+      "information_routing": 0.18102778494358063,
+      "concept_composition": 0.2182195782661438,
+      "prediction_refinement": 0.24614930152893066,
+      "hop_transition": 0.13151612877845764
+    },
+    {
+      "knowledge_enrichment": 0.2423330396413803,
+      "information_routing": 0.1674344390630722,
+      "concept_composition": 0.2075204849243164,
+      "prediction_refinement": 0.25389957427978516,
+      "hop_transition": 0.12881247699260712
+    },
+    {
+      "knowledge_enrichment": 0.2129480391740799,
+      "information_routing": 0.2068072259426117,
+      "concept_composition": 0.22347205877304077,
+      "prediction_refinement": 0.21773087978363037,
+      "hop_transition": 0.13904178142547607
+    },
+    {
+      "knowledge_enrichment": 0.22502896189689636,
+      "information_routing": 0.18682190775871277,
+      "concept_composition": 0.21293574571609497,
+      "prediction_refinement": 0.23704181611537933,
+      "hop_transition": 0.13817155361175537
+    },
+    {
+      "knowledge_enrichment": 0.2476302534341812,
+      "information_routing": 0.15575794875621796,
+      "concept_composition": 0.2332272231578827,
+      "prediction_refinement": 0.20669464766979218,
+      "hop_transition": 0.15668992698192596
+    },
+    {
+      "knowledge_enrichment": 0.2512687146663666,
+      "information_routing": 0.1813855618238449,
+      "concept_composition": 0.23707880079746246,
+      "prediction_refinement": 0.20691511034965515,
+      "hop_transition": 0.1233517974615097
+    },
+    {
+      "knowledge_enrichment": 0.23009325563907623,
+      "information_routing": 0.1633080095052719,
+      "concept_composition": 0.23274989426136017,
+      "prediction_refinement": 0.23197592794895172,
+      "hop_transition": 0.14187291264533997
+    },
+    {
+      "knowledge_enrichment": 0.23433956503868103,
+      "information_routing": 0.18817143142223358,
+      "concept_composition": 0.18983875215053558,
+      "prediction_refinement": 0.2033277153968811,
+      "hop_transition": 0.1843225061893463
+    },
+    {
+      "knowledge_enrichment": 0.23076453804969788,
+      "information_routing": 0.16207419335842133,
+      "concept_composition": 0.21941342949867249,
+      "prediction_refinement": 0.22546464204788208,
+      "hop_transition": 0.16228318214416504
+    },
+    {
+      "knowledge_enrichment": 0.22931498289108276,
+      "information_routing": 0.17447024583816528,
+      "concept_composition": 0.20319248735904694,
+      "prediction_refinement": 0.2642209827899933,
+      "hop_transition": 0.12880128622055054
+    },
+    {
+      "knowledge_enrichment": 0.216847226023674,
+      "information_routing": 0.17527204751968384,
+      "concept_composition": 0.20154859125614166,
+      "prediction_refinement": 0.21839618682861328,
+      "hop_transition": 0.18793590366840363
+    },
+    {
+      "knowledge_enrichment": 0.1815263330936432,
+      "information_routing": 0.20226790010929108,
+      "concept_composition": 0.22736628353595734,
+      "prediction_refinement": 0.21915602684020996,
+      "hop_transition": 0.16968341171741486
+    },
+    {
+      "knowledge_enrichment": 0.2058563232421875,
+      "information_routing": 0.12937939167022705,
+      "concept_composition": 0.20349563658237457,
+      "prediction_refinement": 0.2741575837135315,
+      "hop_transition": 0.1871110051870346
+    },
+    {
+      "knowledge_enrichment": 0.20692014694213867,
+      "information_routing": 0.1700742095708847,
+      "concept_composition": 0.2323780059814453,
+      "prediction_refinement": 0.20673422515392303,
+      "hop_transition": 0.18389341235160828
+    },
+    {
+      "knowledge_enrichment": 0.17042911052703857,
+      "information_routing": 0.15743021667003632,
+      "concept_composition": 0.2394523173570633,
+      "prediction_refinement": 0.2827584445476532,
+      "hop_transition": 0.1499299257993698
+    },
+    {
+      "knowledge_enrichment": 0.14558109641075134,
+      "information_routing": 0.20258453488349915,
+      "concept_composition": 0.18169470131397247,
+      "prediction_refinement": 0.28676995635032654,
+      "hop_transition": 0.1833696961402893
+    },
+    {
+      "knowledge_enrichment": 0.16141925752162933,
+      "information_routing": 0.1832038015127182,
+      "concept_composition": 0.1998436599969864,
+      "prediction_refinement": 0.2461596131324768,
+      "hop_transition": 0.20937363803386688
+    },
+    {
+      "knowledge_enrichment": 0.15791112184524536,
+      "information_routing": 0.17863623797893524,
+      "concept_composition": 0.1844242364168167,
+      "prediction_refinement": 0.2889256477355957,
+      "hop_transition": 0.19010280072689056
+    },
+    {
+      "knowledge_enrichment": 0.18422958254814148,
+      "information_routing": 0.1835794299840927,
+      "concept_composition": 0.20385806262493134,
+      "prediction_refinement": 0.22984209656715393,
+      "hop_transition": 0.19849082827568054
+    },
+    {
+      "knowledge_enrichment": 0.16515518724918365,
+      "information_routing": 0.2850303649902344,
+      "concept_composition": 0.18415457010269165,
+      "prediction_refinement": 0.18202507495880127,
+      "hop_transition": 0.18363484740257263
+    },
+    {
+      "knowledge_enrichment": 0.16423961520195007,
+      "information_routing": 0.2612082064151764,
+      "concept_composition": 0.2159898579120636,
+      "prediction_refinement": 0.18053500354290009,
+      "hop_transition": 0.17802733182907104
+    },
+    {
+      "knowledge_enrichment": 0.19823789596557617,
+      "information_routing": 0.31394070386886597,
+      "concept_composition": 0.20858168601989746,
+      "prediction_refinement": 0.1358780860900879,
+      "hop_transition": 0.1433616280555725
+    },
+    {
+      "knowledge_enrichment": 0.16250553727149963,
+      "information_routing": 0.39507046341896057,
+      "concept_composition": 0.19433929026126862,
+      "prediction_refinement": 0.11697038263082504,
+      "hop_transition": 0.13111427426338196
+    },
+    {
+      "knowledge_enrichment": 0.12609156966209412,
+      "information_routing": 0.18094974756240845,
+      "concept_composition": 0.4518572688102722,
+      "prediction_refinement": 0.08298703283071518,
+      "hop_transition": 0.15811437368392944
+    },
+    {
+      "knowledge_enrichment": 0.1261415034532547,
+      "information_routing": 0.09285339713096619,
+      "concept_composition": 0.4397315979003906,
+      "prediction_refinement": 0.10569686442613602,
+      "hop_transition": 0.23557670414447784
+    },
+    {
+      "knowledge_enrichment": 0.05190158635377884,
+      "information_routing": 0.09595979750156403,
+      "concept_composition": 0.034873832017183304,
+      "prediction_refinement": 0.10087920725345612,
+      "hop_transition": 0.7163856029510498
+    }
+  ],
+  "dominant_transition_counts": [
+    [
+      357.0,
+      62.0,
+      392.0,
+      420.0,
+      29.0
+    ],
+    [
+      28.0,
+      671.0,
+      308.0,
+      60.0,
+      3.0
+    ],
+    [
+      305.0,
+      107.0,
+      557.0,
+      800.0,
+      323.0
+    ],
+    [
+      557.0,
+      178.0,
+      812.0,
+      2132.0,
+      134.0
+    ],
+    [
+      13.0,
+      52.0,
+      23.0,
+      128.0,
+      12.0
+    ]
+  ],
+  "dominant_transition_probabilities": [
+    [
+      0.2833333333333333,
+      0.049206349206349205,
+      0.3111111111111111,
+      0.3333333333333333,
+      0.023015873015873017
+    ],
+    [
+      0.026168224299065422,
+      0.6271028037383177,
+      0.28785046728971964,
+      0.056074766355140186,
+      0.002803738317757009
+    ],
+    [
+      0.14579349904397707,
+      0.0511472275334608,
+      0.2662523900573614,
+      0.3824091778202677,
+      0.15439770554493307
+    ],
+    [
+      0.14607920272751115,
+      0.04668240230789405,
+      0.2129556779438762,
+      0.5591397849462365,
+      0.03514293207448203
+    ],
+    [
+      0.05701754385964912,
+      0.22807017543859648,
+      0.10087719298245613,
+      0.5614035087719298,
+      0.05263157894736842
+    ]
+  ],
+  "mode_order": [
+    "knowledge_enrichment",
+    "information_routing",
+    "concept_composition",
+    "prediction_refinement",
+    "hop_transition"
+  ],
+  "mean_membership_entropy": 1.5423221588134766,
+  "effective_number_of_modes": 4.675434589385986,
+  "training_prior_agreement": {
+    "pearson_correlation": {
+      "knowledge_enrichment": 0.7921838164329529,
+      "information_routing": 0.8588293194770813,
+      "concept_composition": 0.7982181310653687,
+      "prediction_refinement": 0.5712452530860901,
+      "hop_transition": 0.8028419017791748
+    },
+    "kl_prior_to_membership": 0.11036670207977295,
+    "independent_semantic_validation": false
+  }
+}

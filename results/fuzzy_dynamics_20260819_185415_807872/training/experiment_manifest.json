@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "experiment_time": "20260819_185415_807872",
+  "status": "complete",
+  "seed": 42,
+  "activations": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/cache/socrates_llama3_8b_tuned_full.pt",
+  "config": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/configs/fuzzy_dynamics_rollout_h4.json",
+  "checkpoint_dir": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260819_185415_807872/checkpoint",
+  "experiment_dir": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260819_185415_807872",
+  "training_results_dir": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260819_185415_807872/training",
+  "evaluation_results_dir": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260819_185415_807872/evaluation",
+  "log_dir": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs/fuzzy_dynamics_20260819_185415_807872",
+  "split_file": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260819_185415_807872/training/split.json",
+  "history_file": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260819_185415_807872/training/history.json",
+  "best_validation_loss": 0.4135154273177757
+}

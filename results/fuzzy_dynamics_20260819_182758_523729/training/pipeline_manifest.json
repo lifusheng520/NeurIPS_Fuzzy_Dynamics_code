@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "experiment_time": "20260819_182758_523729",
+  "status": "running",
+  "started_at": "2026-08-19T08:27:58.552188+00:00",
+  "seed": 42,
+  "device": "cuda",
+  "runtime_environment": {
+    "python": "3.11.8",
+    "python_executable": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/bin/python",
+    "platform": {
+      "system": "Linux",
+      "release": "7.1.4-200.fc44.x86_64",
+      "machine": "x86_64"
+    },
+    "packages": {
+      "torch": "2.13.0",
+      "transformers": "4.57.6",
+      "accelerate": "1.14.0",
+      "numpy": "1.26.4",
+      "pandas": "2.3.3",
+      "datasets": "4.8.5",
+      "tuned-lens": "0.2.0",
+      "baukit": "0.0.1",
+      "vllm": null
+    }
+  },
+  "activations": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/cache/socrates_llama3_8b_tuned_full.pt",
+  "activation_file_identity": {
+    "size": 11543690696,
+    "mtime_ns": 1786934486934512000
+  },
+  "evaluation_activations": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/cache/socrates_llama3_8b_tuned_full.pt",
+  "evaluation_activation_file_identity": {
+    "size": 11543690696,
+    "mtime_ns": 1786934486934512000
+  },
+  "config": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/configs/fuzzy_dynamics_base.json",
+  "semantic_events": null,
+  "experiment_dir": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260819_182758_523729",
+  "log_dir": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs/fuzzy_dynamics_20260819_182758_523729",
+  "pipeline_log": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs/fuzzy_dynamics_20260819_182758_523729/run_pipeline_20260819_182758_537796.log",
+  "stages": {
+    "training": {
+      "status": "running",
+      "started_at": "2026-08-19T08:27:58.625054+00:00",
+      "command": [
+        "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/.venv/bin/python",
+        "-m",
+        "scripts.train_fuzzy_dynamics",
+        "--activations",
+        "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/cache/socrates_llama3_8b_tuned_full.pt",
+        "--config",
+        "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/configs/fuzzy_dynamics_base.json",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--results-root",
+        "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results",
+        "--experiment-time",
+        "20260819_182758_523729",
+        "--log-dir",
+        "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/logs",
+        "--log-every-batches",
+        "10"
+      ]
+    }
+  },
+  "current_stage": "training",
+  "updated_at": "2026-08-19T08:27:58.625044+00:00"
+}
