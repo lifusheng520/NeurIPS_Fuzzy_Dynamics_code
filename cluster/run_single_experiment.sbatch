@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=fuzzy-dynamics
-#SBATCH --partition=hopper96
+#SBATCH --partition=hopper140
 #SBATCH --gres=gpu:nvidia:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=30G

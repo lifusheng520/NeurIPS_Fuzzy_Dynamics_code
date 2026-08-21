@@ -1,0 +1,33 @@
+{
+  "schema_version": 3,
+  "experiment_time": "20260820_211428_168522",
+  "checkpoint": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260820_211428_168522/checkpoint/best.pt",
+  "activations": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/cache/socrates_llama3_8b_tuned_full.pt",
+  "checkpoint_epoch": 81,
+  "cache_model_name": "data/models/Meta-Llama-3-8B",
+  "device": "cuda",
+  "operation_source": "predicted",
+  "operation_projection": "frozen_pca",
+  "autonomous_context_layer": 1,
+  "selection": {
+    "subset": "validation",
+    "split_file": "/bigdata/users/90967055/fuzzyDynamics/NeurIPS_Fuzzy_Dynamics_code/results/fuzzy_dynamics_20260820_211428_168522/training/split.json",
+    "split_by": "category",
+    "selected_count": 968,
+    "cache_count": 7232,
+    "selected_indices_sha256": "3681059abbe26743275999a5a4778cc9f4447307cd2a9421f1e139e5171b2dec",
+    "same_as_training_activation_cache": true,
+    "holdout_status": "verified_training_split_validation"
+  },
+  "semantic_events": {
+    "kind": "automatic_training_prior_overlapping_proxies",
+    "independent_of_training": false,
+    "layer_axis": "transition_s_l_to_s_l_plus_1",
+    "include_operation_proxies": false,
+    "prediction_refinement_score": "sqrt(relu(margin_change)*relu(uncertainty_drop))",
+    "bridge_and_answer_scores_used_for": [
+      "concept_composition",
+      "hop_transition"
+    ]
+  }
+}
